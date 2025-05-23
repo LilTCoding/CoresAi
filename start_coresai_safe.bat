@@ -1,33 +1,27 @@
 @echo off
-chcp 65001 > nul
+title CoresAI - Advanced AI Assistant
 echo.
-echo ===================================================
-echo          CoresAI System Startup
-echo ===================================================
-echo.
-echo Production Backend: http://localhost:8080
-echo Streaming Backend:  http://localhost:8081
-echo GUI Application:    python gui_app.py
-echo.
-echo Starting backends in separate windows...
+echo Starting CoresAI Advanced AI Assistant...
 echo.
 
-REM Start production backend in new window
-start "CoresAI Production" cmd /k "python production_ai_backend.py"
+REM Start the backend server
+echo Starting backend server on port 8082...
+start "CoresAI Backend" cmd /c "uvicorn crypto_trading_backend:app --host 0.0.0.0 --port 8082 --reload"
 
-REM Wait 3 seconds for first backend to start
-timeout /t 3 > nul
+REM Wait for backend to start
+echo Waiting for backend to initialize...
+timeout /t 5 /nobreak > nul
 
-REM Start streaming backend in new window  
-start "CoresAI Streaming" cmd /k "python streaming_ai_backend.py"
+REM Start the frontend
+echo Starting React frontend...
+cd frontend
+start "CoresAI Frontend" cmd /c "npm start"
 
 echo.
-echo ===================================================
-echo Both backends are starting in separate windows
-echo Check the new command windows for status
+echo CoresAI is now running!
+echo Frontend: http://localhost:3000
+echo Backend API: http://localhost:8082
+echo API Documentation: http://localhost:8082/docs
 echo.
-echo To start GUI: python gui_app.py
-echo To test: open http://localhost:8080/docs
-echo ===================================================
-echo.
-pause 
+echo Press any key to close this window (services will continue running)...
+pause > nul 

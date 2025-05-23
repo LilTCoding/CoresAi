@@ -1,7 +1,7 @@
 {
   "api_version": "v1",
   "base_urls": {
-    "production": "http://localhost:8080",
+    "production": "http://localhost:8082",
     "streaming": "http://localhost:8081"
   },
   "endpoints": {
