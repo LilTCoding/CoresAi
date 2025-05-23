@@ -1,33 +1,28 @@
 {
   "version": 2,
-  "name": "coresai-frontend",
   "builds": [
+    {
+      "src": "crypto_trading_backend.py",
+      "use": "@vercel/python"
+    },
     {
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+      "config": { "distDir": "build" }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "https://your-backend-domain.vercel.app/api/$1"
+      "dest": "crypto_trading_backend.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "frontend/$1"
     }
   ],
   "env": {
-    "REACT_APP_PRODUCTION_API_URL": "https://your-production-backend.vercel.app",
-    "REACT_APP_STREAMING_API_URL": "https://your-streaming-backend.vercel.app"
-  },
-  "build": {
-    "env": {
-      "REACT_APP_PRODUCTION_API_URL": "https://your-production-backend.vercel.app",
-      "REACT_APP_STREAMING_API_URL": "https://your-streaming-backend.vercel.app"
-    }
+    "PYTHON_VERSION": "3.13",
+    "NODE_VERSION": "18.x"
   }
 } 
