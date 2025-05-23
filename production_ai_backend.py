@@ -14,6 +14,8 @@ import uvicorn
 
 # Constants
 SUPPORTED_GAMES = ["fivem_qb", "minecraft", "arma_reforger", "rust"]
+HOST = os.getenv('CORESAI_IP', '0.0.0.0')
+PORT = int(os.getenv('CORESAI_BACKEND_PORT', 8082))
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -23,10 +25,14 @@ app = FastAPI(
     version="3.0.0"
 )
 
-# Add CORS middleware
+# Add CORS middleware with dynamic origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        f"http://{HOST}:{os.getenv('CORESAI_FRONTEND_PORT', '3000')}",
+        "http://localhost:3000",
+        "*"  # Fallback for development
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -408,14 +414,14 @@ if __name__ == "__main__":
             os.system("chcp 65001 > nul")
         
         print("=== Starting CoresAI Production Backend ===")
-        print("Server: http://localhost:8080")
-        print("Documentation: http://localhost:8080/docs") 
+        print(f"Server: http://{HOST}:{PORT}")
+        print(f"Documentation: http://{HOST}:{PORT}/docs")
         print("Features: Web Search, Enhanced AI, Real-time Data")
         print("Performance: Production Optimized")
         print("Version 3.0.0 - Ready for Distribution")
         print("=" * 50)
         
-        uvicorn.run(app, host="0.0.0.0", port=8080)
+        uvicorn.run(app, host=HOST, port=PORT)
     except Exception as e:
         print(f"Error starting server: {e}")
         sys.exit(1) 

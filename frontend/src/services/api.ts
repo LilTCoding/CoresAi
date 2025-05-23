@@ -1,37 +1,17 @@
 import axios from 'axios';
 
-// Backend URLs based on your current setup
-const PRODUCTION_API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-production-backend.vercel.app' 
-  : 'http://localhost:8080';
+// Backend URLs based on environment
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://cores-ai.vercel.app/api'
+  : 'http://localhost:8082';
 
-const STREAMING_API_URL = process.env.NODE_ENV === 'production'
-  ? 'https://your-streaming-backend.vercel.app'
-  : 'http://localhost:8081';
-
-// Create axios instances for different backends
-const productionApi = axios.create({
-  baseURL: PRODUCTION_API_URL,
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
-});
-
-const streamingApi = axios.create({
-  baseURL: STREAMING_API_URL,
-  timeout: 60000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
 });
 
 // Types based on your schemas
@@ -76,37 +56,35 @@ export interface HealthResponse {
 }
 
 // Health check functions
-export const checkBackendHealth = async (backend: 'production' | 'streaming'): Promise<boolean> => {
+export const checkBackendHealth = async (): Promise<boolean> => {
   try {
-    const api = backend === 'production' ? productionApi : streamingApi;
     const response = await api.get('/health');
     return response.status === 200 && response.data.status === 'healthy';
   } catch (error) {
-    console.error(`${backend} backend health check failed:`, error);
+    console.error('Backend health check failed:', error);
     return false;
   }
 };
 
-export const getHealthDetails = async (backend: 'production' | 'streaming'): Promise<HealthResponse | null> => {
+export const getHealthDetails = async (): Promise<HealthResponse | null> => {
   try {
-    const api = backend === 'production' ? productionApi : streamingApi;
     const response = await api.get('/health');
     return response.data;
   } catch (error) {
-    console.error(`Failed to get ${backend} health details:`, error);
+    console.error('Failed to get health details:', error);
     return null;
   }
 };
 
 // Chat functions
 export const sendChatMessage = async (messages: Message[]): Promise<ChatResponse> => {
-  const response = await productionApi.post('/api/v1/chat', { messages });
+  const response = await api.post('/api/v1/chat', { messages });
   return response.data;
 };
 
 // Web search functions
 export const performWebSearch = async (query: string): Promise<WebSearchResponse> => {
-  const response = await productionApi.post('/api/v1/search', { query });
+  const response = await api.post('/api/v1/search', { query });
   return response.data;
 };
 

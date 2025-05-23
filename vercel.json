@@ -2,19 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "crypto_trading_backend.py",
-      "use": "@vercel/python"
-    },
-    {
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "config": {
+        "distDir": "build"
+      }
+    },
+    {
+      "src": "production_ai_backend.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "crypto_trading_backend.py"
+      "dest": "production_ai_backend.py"
     },
     {
       "src": "/(.*)",
@@ -22,7 +24,6 @@
     }
   ],
   "env": {
-    "PYTHON_VERSION": "3.13",
-    "NODE_VERSION": "18.x"
+    "PYTHON_VERSION": "3.13"
   }
 } 
