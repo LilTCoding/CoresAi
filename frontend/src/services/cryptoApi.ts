@@ -8,15 +8,7 @@ declare global {
 }
 
 // Create axios instance for crypto API
-const cryptoApi = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' 
-    ? 'https://your-crypto-backend.vercel.app' 
-    : 'http://localhost:8082',
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+const API_BASE_URL = 'http://localhost:8082/api/v1';
 
 // Types and Interfaces
 export interface WalletData {
@@ -179,6 +171,23 @@ export interface MiningSchedule {
   days: string[];
   coin: string;
   lowPowerMode: boolean;
+}
+
+export interface Pool {
+  id: string;
+  name: string;
+  size: number;
+  returnPct: number;
+  members: number;
+  privacy: string;
+  split_mode: string;
+}
+
+export interface BoostStatus {
+  boost: number;
+  boost_active: boolean;
+  boost_ends_in: number;
+  countdown: number;
 }
 
 // Mock data for development (replace with real API calls)
@@ -706,15 +715,8 @@ export const analyzeWalletBehavior = async (address: string): Promise<string> =>
 // Portfolio Analytics
 export const getPortfolioAnalytics = async (): Promise<any> => {
   try {
-    return {
-      totalReturn: 34.56,
-      sharpeRatio: 1.23,
-      maxDrawdown: -15.67,
-      winRate: 67.8,
-      averageHoldTime: '4.2 days',
-      bestPerformer: 'SOL (+89.4%)',
-      worstPerformer: 'DOGE (-23.1%)'
-    };
+    const response = await axios.get(`${API_BASE_URL}/portfolio/analytics`);
+    return response.data;
   } catch (error) {
     console.error('Failed to get portfolio analytics:', error);
     return null;
@@ -724,7 +726,7 @@ export const getPortfolioAnalytics = async (): Promise<any> => {
 // Mining API Functions
 export const detectHardware = async (): Promise<HardwareInfo> => {
   try {
-    const response = await cryptoApi.get('/api/v1/mining/hardware');
+    const response = await axios.get(`${API_BASE_URL}/mining/hardware`);
     return response.data.hardware;
   } catch (error) {
     console.error('Failed to detect hardware:', error);
@@ -741,7 +743,7 @@ export const startMining = async (coin: string, pool: string): Promise<void> => 
       throw new Error('No wallet connected');
     }
 
-    await cryptoApi.post('/api/v1/mining/start', {
+    await axios.post(`${API_BASE_URL}/mining/start`, {
       coin,
       pool,
       wallet_address: walletAddress
@@ -763,7 +765,7 @@ export const startMining = async (coin: string, pool: string): Promise<void> => 
 
 export const stopMining = async (): Promise<void> => {
   try {
-    await cryptoApi.post('/api/v1/mining/stop', {}, {
+    await axios.post(`${API_BASE_URL}/mining/stop`, {}, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
       }
@@ -781,7 +783,7 @@ export const stopMining = async (): Promise<void> => {
 
 export const getMiningStatus = async (): Promise<MiningStatus> => {
   try {
-    const response = await cryptoApi.get('/api/v1/mining/status', {
+    const response = await axios.get(`${API_BASE_URL}/mining/status`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
       }
@@ -820,7 +822,7 @@ export const getMiningStatus = async (): Promise<MiningStatus> => {
 
 export const getMiningEarnings = async (): Promise<MiningEarnings> => {
   try {
-    const response = await cryptoApi.get('/api/v1/mining/earnings', {
+    const response = await axios.get(`${API_BASE_URL}/mining/earnings`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
       }
@@ -836,7 +838,7 @@ export const getMiningEarnings = async (): Promise<MiningEarnings> => {
 
 export const getMiningPools = async (): Promise<MiningPool[]> => {
   try {
-    const response = await cryptoApi.get('/api/v1/mining/pools');
+    const response = await axios.get(`${API_BASE_URL}/mining/pools`);
     return response.data.pools;
   } catch (error) {
     console.error('Failed to get mining pools:', error);
@@ -848,7 +850,7 @@ export const getMiningPools = async (): Promise<MiningPool[]> => {
 
 export const benchmarkHardware = async (): Promise<void> => {
   try {
-    await cryptoApi.post('/api/v1/mining/benchmark', {}, {
+    await axios.post(`${API_BASE_URL}/mining/benchmark`, {}, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
       }
@@ -873,7 +875,7 @@ export const benchmarkHardware = async (): Promise<void> => {
 
 export const getAIMiningRecommendations = async (): Promise<AIRecommendation[]> => {
   try {
-    const response = await cryptoApi.get('/api/v1/mining/ai-recommendations', {
+    const response = await axios.get(`${API_BASE_URL}/mining/ai-recommendations`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
       }
@@ -910,16 +912,55 @@ export const getMiningSchedule = async (): Promise<MiningSchedule | null> => {
 };
 
 // --- Crypto Pool System API ---
-export const createPool = async (data: any) => cryptoApi.post('/api/v1/pools/create', data);
-export const inviteToPool = async (data: any) => cryptoApi.post('/api/v1/pools/invite', data);
-export const joinPool = async (data: any) => cryptoApi.post('/api/v1/pools/join', data);
-export const getPoolStatus = async (poolId: string) => cryptoApi.get(`/api/v1/pools/status/${poolId}`);
-export const executePoolTrade = async (data: any) => cryptoApi.post('/api/v1/pools/trade', data);
-export const depositToPool = async (data: any) => cryptoApi.post('/api/v1/pools/deposit', data);
-export const withdrawFromPool = async (data: any) => cryptoApi.post('/api/v1/pools/withdraw', data);
-export const getPoolLogs = async (poolId: string) => cryptoApi.get(`/api/v1/pools/logs/${poolId}`);
-export const spinBoost = async (poolId: string) => cryptoApi.post(`/api/v1/pools/boost/spin`, { poolId });
-export const getBoostStatus = async (poolId: string) => cryptoApi.get(`/api/v1/pools/boost/status/${poolId}`);
+export const createPool = async (data: any) => {
+  const response = await axios.post(`${API_BASE_URL}/pools/create`, data);
+  return response.data;
+};
+
+export const inviteToPool = async (data: any) => {
+  const response = await axios.post(`${API_BASE_URL}/pools/invite`, data);
+  return response.data;
+};
+
+export const joinPool = async (data: any) => {
+  const response = await axios.post(`${API_BASE_URL}/pools/join`, data);
+  return response.data;
+};
+
+export const getPoolStatus = async (poolId: string) => {
+  const response = await axios.get(`${API_BASE_URL}/pools/status/${poolId}`);
+  return response.data;
+};
+
+export const executePoolTrade = async (data: any) => {
+  const response = await axios.post(`${API_BASE_URL}/pools/trade`, data);
+  return response.data;
+};
+
+export const depositToPool = async (data: any) => {
+  const response = await axios.post(`${API_BASE_URL}/pools/deposit`, data);
+  return response.data;
+};
+
+export const withdrawFromPool = async (data: any) => {
+  const response = await axios.post(`${API_BASE_URL}/pools/withdraw`, data);
+  return response.data;
+};
+
+export const getPoolLogs = async (poolId: string) => {
+  const response = await axios.get(`${API_BASE_URL}/pools/logs/${poolId}`);
+  return response.data;
+};
+
+export const spinBoost = async (data: any): Promise<BoostStatus> => {
+  const response = await axios.post(`${API_BASE_URL}/pools/boost/spin`, data);
+  return response.data;
+};
+
+export const getBoostStatus = async (poolId: string): Promise<BoostStatus> => {
+  const response = await axios.get(`${API_BASE_URL}/pools/boost/status/${poolId}`);
+  return response.data;
+};
 
 export default {
   connectWallet,

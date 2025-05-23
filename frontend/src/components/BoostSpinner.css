@@ -138,4 +138,98 @@
   font-size: 1rem;
   color: #00b8ff;
   text-shadow: 0 0 8px #00b8ff;
+}
+
+.boost-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+}
+
+.spinner-wheel {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  position: relative;
+  background: linear-gradient(45deg, #333333, #444444);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+  margin-bottom: 2rem;
+  transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spinner-wheel.active {
+  animation: pulse 2s infinite;
+}
+
+.spinner-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.boost-active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #00ff88;
+}
+
+.boost-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.boost-label {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.spin-button {
+  background: #00ff88;
+  color: #1a1a1a;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.spin-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.spin-button:disabled {
+  background: #666666;
+  cursor: not-allowed;
+}
+
+.countdown-timer {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(0, 255, 136, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+  }
 } 

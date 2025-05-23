@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import cryptoApi, { Pool, BoostStatus } from '../services/cryptoApi';
 import BoostSpinner from './BoostSpinner';
 import './CryptoPoolsDashboard.css';
 
@@ -19,89 +20,93 @@ const mockMembers = [
   { name: '0xE5...F6', status: 'active', payout: 1800 },
 ];
 
-const CryptoPoolsDashboard: React.FC = () => {
-  const [selectedPool, setSelectedPool] = useState(mockPools[0]);
-  const [boostResult, setBoostResult] = useState<number | null>(null);
-  const [boostActive, setBoostActive] = useState(false);
-  const [boostEndsIn, setBoostEndsIn] = useState(3600); // 1h
-  const [countdown, setCountdown] = useState(86400); // 1 day
+interface CryptoPoolsDashboardProps {
+  marketData: any;
+}
 
-  // Simulate boost spin
-  const handleSpin = async () => {
-    const results = [250, 300, 450, 500];
-    const result = results[Math.floor(Math.random() * results.length)];
-    setBoostResult(result);
-    setBoostActive(true);
-    setBoostEndsIn(604800); // 7 days
-    setCountdown(604800); // lock for 14 days
-    return result;
+const CryptoPoolsDashboard: React.FC<CryptoPoolsDashboardProps> = ({ marketData }) => {
+  const [pools, setPools] = useState<Pool[]>([]);
+  const [selectedPool, setSelectedPool] = useState<string | null>(null);
+  const [boostStatus, setBoostStatus] = useState<BoostStatus>({
+    boost: 0,
+    boost_active: false,
+    boost_ends_in: 0,
+    countdown: 0
+  });
+
+  const handleBoostSpin = async () => {
+    if (!selectedPool) return;
+    try {
+      const result = await cryptoApi.spinBoost({ poolId: selectedPool });
+      setBoostStatus(result);
+    } catch (error) {
+      console.error('Failed to spin boost:', error);
+    }
+  };
+
+  const handlePoolSelect = async (poolId: string) => {
+    setSelectedPool(poolId);
+    try {
+      const status = await cryptoApi.getBoostStatus(poolId);
+      setBoostStatus(status);
+    } catch (error) {
+      console.error('Failed to get boost status:', error);
+    }
   };
 
   return (
     <div className="crypto-pools-dashboard">
-      <aside className="pools-sidebar">
-        <div className="sidebar-title">My Pools</div>
-        <ul>
-          {mockPools.map(pool => (
-            <li
+      <div className="dashboard-header">
+        <h1>Crypto Pools Dashboard</h1>
+        <div className="market-summary">
+          <h3>Market Overview</h3>
+          {marketData && (
+            <div className="market-stats">
+              <span>BTC: ${marketData.btc_price}</span>
+              <span>ETH: ${marketData.eth_price}</span>
+              <span>24h Volume: ${marketData.volume_24h}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="dashboard-content">
+        <div className="pools-list">
+          <h2>Your Pools</h2>
+          {pools.map((pool) => (
+            <div
               key={pool.id}
-              className={selectedPool.id === pool.id ? 'active' : ''}
-              onClick={() => setSelectedPool(pool)}
+              className={`pool-card ${selectedPool === pool.id ? 'selected' : ''}`}
+              onClick={() => handlePoolSelect(pool.id)}
             >
-              {pool.name}
-            </li>
+              <h3>{pool.name}</h3>
+              <div className="pool-stats">
+                <p>Size: ${pool.size}</p>
+                <p>Return: {pool.returnPct}%</p>
+                <p>Members: {pool.members}</p>
+                <p>Privacy: {pool.privacy}</p>
+                <p>Split Mode: {pool.split_mode}</p>
+              </div>
+            </div>
           ))}
-        </ul>
-        <div className="sidebar-title">Discover Pools</div>
-        <ul>
-          <li>Public Pool X</li>
-          <li>Public Pool Y</li>
-        </ul>
-      </aside>
-      <main className="pools-main">
-        <div className="pools-top-panel">
-          <div className="pool-name">{selectedPool.name}</div>
-          <div className="pool-size">${selectedPool.size.toLocaleString()} USD</div>
-          <div className="pool-return">Return: {selectedPool.returnPct}%</div>
-          <div className="pool-members">Members: {selectedPool.members}</div>
         </div>
-        <div className="pools-center-panel">
-          <div className="trade-feed">
-            <div className="feed-title">Live Trade Feed</div>
-            <ul>
-              {mockFeed.map((item, i) => (
-                <li key={i}><b>{item.action}:</b> {item.desc} <span className="feed-time">{item.time}</span></li>
-              ))}
-            </ul>
-          </div>
-          <div className="member-list">
-            <div className="member-title">Members</div>
-            <ul>
-              {mockMembers.map((m, i) => (
-                <li key={i} className={m.status}>{m.name} <span className="member-status">{m.status}</span> <span className="member-payout">${m.payout}</span></li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="pools-right-panel">
-          <div className="earnings-chart">[Earnings Chart Placeholder]</div>
-          <div className="member-payouts">[Member Payouts Placeholder]</div>
+
+        <div className="boost-section">
+          <h2>Boost Spinner</h2>
           <BoostSpinner
-            isHost={true}
-            canSpin={!boostActive}
-            onSpin={handleSpin}
-            boostResult={boostResult}
-            countdown={countdown}
-            boostActive={boostActive}
-            boostEndsIn={boostEndsIn}
+            active={boostStatus.boost_active}
+            boost={boostStatus.boost}
+            countdown={boostStatus.countdown}
+            onSpin={handleBoostSpin}
           />
+          {boostStatus.boost_active && (
+            <div className="boost-info">
+              <p>Current Boost: {boostStatus.boost}x</p>
+              <p>Ends in: {boostStatus.boost_ends_in}s</p>
+            </div>
+          )}
         </div>
-        <div className="pools-bottom-panel">
-          <button className="pools-btn">Deposit</button>
-          <button className="pools-btn">Trade</button>
-          <button className="pools-btn">Withdraw</button>
-        </div>
-      </main>
+      </div>
     </div>
   );
 };
