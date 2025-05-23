@@ -7,7 +7,8 @@ import {
   ChatBubbleLeftRightIcon,
   MagnifyingGlassIcon,
   PaintBrushIcon,
-  CubeTransparentIcon
+  CubeTransparentIcon,
+  CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -16,6 +17,7 @@ const navigation = [
   { name: 'Web Search', href: '/search', icon: MagnifyingGlassIcon },
   { name: 'Streaming', href: '/streaming', icon: CubeTransparentIcon },
   { name: 'Creative Software', href: '/creative', icon: PaintBrushIcon },
+  { name: 'Crypto Trading', href: '/crypto', icon: CurrencyDollarIcon },
 ];
 
 const Navbar: React.FC = () => {

@@ -7,6 +7,7 @@ import Chat from './pages/Chat.tsx';
 import StreamingDemo from './pages/StreamingDemo.tsx';
 import CreativeSoftware from './pages/CreativeSoftware.tsx';
 import WebSearch from './pages/WebSearch.tsx';
+import CryptoTrading from './pages/CryptoTrading.tsx';
 import BackendStatus from './components/BackendStatus.tsx';
 import { checkBackendHealth } from './services/api.ts';
 
@@ -54,6 +55,7 @@ function App() {
           <Route path="/streaming" element={<StreamingDemo />} />
           <Route path="/creative" element={<CreativeSoftware />} />
           <Route path="/search" element={<WebSearch />} />
+          <Route path="/crypto" element={<CryptoTrading />} />
         </Routes>
       </main>
 
