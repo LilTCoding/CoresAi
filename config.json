@@ -51,15 +51,13 @@
     "enabled": true,
     "file": "gui_app.py",
     "features": [
-      "face_detection",
-      "ai_head_tracking",
       "server_management",
       "game_server_tabs",
       "file_editing",
       "ai_chat"
     ],
     "face_detection": {
-      "enabled": true,
+      "enabled": false,
       "camera_index": 0,
       "head_image": "ai_facedetect_head.png",
       "sensitivity": 0.1,
@@ -83,7 +81,7 @@
         "preload": false
       },
       "face_detection": {
-        "enabled": true,
+        "enabled": false,
         "backend": "opencv",
         "cascade": "haarcascade_frontalface_default.xml"
       }
@@ -92,7 +90,6 @@
       "natural_language_processing",
       "web_search", 
       "structured_streaming",
-      "face_detection",
       "creative_software_knowledge",
       "real_time_responses"
     ]
