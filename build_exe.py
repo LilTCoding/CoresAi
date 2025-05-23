@@ -57,10 +57,10 @@ def create_executable():
             logger.info(f"Created dist directory: {dist_dir}")
 
         # Create main.py if it doesn't exist
-        main_path = os.path.join(current_dir, "main.py")
+        main_path = os.path.join(current_dir, "gui_app.py")  # Changed to use gui_app.py directly
         if not os.path.exists(main_path):
-            logger.info("Creating main.py entry point...")
-            create_main_file()
+            logger.error("gui_app.py not found!")
+            return
 
         # Define PyInstaller arguments
         args = [
@@ -73,6 +73,8 @@ def create_executable():
             '--add-data=src;src',  # Include source files
             '--add-data=frontend/build;frontend/build',  # Include frontend build
             '--add-data=*.json;.',  # Include JSON files
+            '--add-data=*.png;.',  # Include images
+            '--add-data=*.ico;.',  # Include icons
             '--hidden-import=wmi',
             '--hidden-import=win32com.client',
             '--hidden-import=pythoncom',
@@ -83,6 +85,31 @@ def create_executable():
             '--hidden-import=requests',
             '--hidden-import=asyncio',
             '--hidden-import=aiohttp',
+            '--hidden-import=PyQt5',
+            '--hidden-import=PyQt5.QtCore',
+            '--hidden-import=PyQt5.QtGui',
+            '--hidden-import=PyQt5.QtWidgets',
+            '--hidden-import=psutil',
+            '--hidden-import=ccxt',
+            '--hidden-import=web3',
+            '--hidden-import=eth_account',
+            '--hidden-import=cryptography',
+            '--hidden-import=redis',
+            '--hidden-import=fastapi',
+            '--hidden-import=uvicorn',
+            '--hidden-import=websockets',
+            '--hidden-import=schedule',
+            '--hidden-import=hmac',
+            '--hidden-import=hashlib',
+            '--hidden-import=base64',
+            '--hidden-import=json',
+            '--hidden-import=time',
+            '--hidden-import=datetime',
+            '--hidden-import=threading',
+            '--hidden-import=queue',
+            '--hidden-import=logging',
+            '--hidden-import=os',
+            '--hidden-import=sys',
             '--distpath=' + dist_dir,  # Specify dist directory
             '--workpath=' + os.path.join(current_dir, "build"),  # Specify build directory
             '--specpath=' + current_dir,  # Specify spec file directory

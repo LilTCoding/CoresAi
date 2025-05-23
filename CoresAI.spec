@@ -1,68 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-import os
-
-block_cipher = None
 
 a = Analysis(
-    ['gui_app.py'],  # Main application entry point
-    pathex=['.'],
+    ['gui_app.py'],
+    pathex=[],
     binaries=[],
-    datas=[
-        ('dragon_logo.png', '.'),
-        ('header_image.png', '.'),
-        ('data', 'data'),
-        ('models', 'models'),
-        ('src', 'src'),
-        ('*.json', '.'),
-        ('requirements.txt', '.'),
-        ('README.md', '.'),
-    ],
-    hiddenimports=[
-        'fastapi',
-        'uvicorn',
-        'PyQt5',
-        'PyQt5.QtCore',
-        'PyQt5.QtGui',
-        'PyQt5.QtWidgets',
-        'requests',
-        'pydantic',
-        'numpy',
-        'pandas',
-        'discord',
-        'asyncio',
-        'aiohttp',
-        'psutil',
-        'wmi',
-        'win32com.client',
-        'pythoncom',
-        'PIL',
-        'tkinter',
-        'multiprocessing',
-    ],
+    datas=[('*.json', '.'), ('*.png', '.'), ('*.ico', '.')],
+    hiddenimports=['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'wmi', 'win32com.client', 'pythoncom', 'psutil', 'ccxt', 'web3', 'eth_account', 'cryptography', 'redis', 'fastapi', 'uvicorn', 'websockets', 'schedule'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[
-        'bark',
-        'torch',
-        'transformers',
-        'tensorflow',
-        'matplotlib',
-    ],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
+    excludes=[],
     noarchive=False,
+    optimize=0,
 )
-
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.zipfiles,
     a.datas,
     [],
     name='CoresAI',
@@ -78,5 +35,4 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='dragon_logo.png' if os.path.exists('dragon_logo.png') else None,
 )
