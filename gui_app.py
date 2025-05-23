@@ -600,7 +600,7 @@ class ServerTab(QWidget):
         if name.endswith("/"):
             # Directory
             name = name[:-1]
-        if self.current_subdir:
+            if self.current_subdir:
                 self.current_subdir += "/" + name
             else:
                 self.current_subdir = name
@@ -629,7 +629,7 @@ class ServerTab(QWidget):
                 resp = requests.post("http://localhost:8080/api/v1/create-file",
                                   json={"game": self.game_key, "path": path, "content": ""})
                 if resp.status_code == 200:
-            self.refresh_file_list()
+                    self.refresh_file_list()
                 else:
                     QMessageBox.warning(self, "Error", "Failed to create file")
             except Exception as e:

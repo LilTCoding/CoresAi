@@ -1,342 +1,237 @@
 """
-CoresAI Build Script
-Packages the entire AI application into a standalone executable
+CoresAI Executable Builder
+Packages the entire CoresAI system into a standalone executable
 """
 
 import os
 import sys
-import subprocess
 import shutil
-from pathlib import Path
+import subprocess
+import PyInstaller.__main__
+from PIL import Image
+import logging
 
-def install_pyinstaller():
-    """Install PyInstaller if not already installed"""
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+def convert_png_to_ico(png_path: str, ico_path: str) -> bool:
+    """Convert PNG to ICO format for Windows executable."""
     try:
-        import PyInstaller
-        print("✅ PyInstaller is already installed")
-    except ImportError:
-        print("📦 Installing PyInstaller...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
-        print("✅ PyInstaller installed successfully")
-
-def create_spec_file():
-    """Create PyInstaller spec file for the AI application"""
-    spec_content = '''
-# -*- mode: python ; coding: utf-8 -*-
-
-block_cipher = None
-
-# Main GUI application
-gui_analysis = Analysis(
-    ['gui_app.py'],
-    pathex=['.'],
-    binaries=[],
-    datas=[
-        ('dragon_logo.png', '.'),
-        ('header_image.png', '.'),
-        ('data', 'data'),
-        ('models', 'models'),
-        ('src', 'src'),
-        ('production_ai_backend.py', '.'),
-        ('test_ai_interface.html', '.'),
-        ('requirements.txt', '.'),
-        ('README.md', '.'),
-    ],
-    hiddenimports=[
-        'fastapi',
-        'uvicorn',
-        'PyQt5',
-        'PyQt5.QtCore',
-        'PyQt5.QtGui', 
-        'PyQt5.QtWidgets',
-        'requests',
-        'pydantic',
-        'numpy',
-        'psutil',
-        'wmi',
-        'sounddevice',
-        'soundfile',
-        'multiprocessing',
-    ],
-    hookspath=[],
-    hooksconfig={},
-    runtime_hooks=[],
-    excludes=[
-        'bark',
-        'torch',
-        'transformers',
-        'tensorflow',
-        'matplotlib',
-        'pandas',
-    ],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
-    noarchive=False,
-)
-
-gui_pyz = PYZ(gui_analysis.pure, gui_analysis.zipped_data, cipher=block_cipher)
-
-gui_exe = EXE(
-    gui_pyz,
-    gui_analysis.scripts,
-    [],
-    exclude_binaries=True,
-    name='CoresAI-GUI',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
-    console=False,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
-    icon='dragon_logo.png' if os.path.exists('dragon_logo.png') else None,
-)
-
-# Backend application
-backend_analysis = Analysis(
-    ['production_ai_backend.py'],
-    pathex=['.'],
-    binaries=[],
-    datas=[
-        ('src', 'src'),
-        ('data', 'data'),
-        ('models', 'models'),
-    ],
-    hiddenimports=[
-        'fastapi',
-        'uvicorn',
-        'pydantic',
-        'requests',
-        'numpy',
-        'psutil',
-        'wmi',
-        'multiprocessing',
-    ],
-    hookspath=[],
-    hooksconfig={},
-    runtime_hooks=[],
-    excludes=[
-        'bark',
-        'torch', 
-        'transformers',
-        'tensorflow',
-        'matplotlib',
-        'pandas',
-        'PyQt5',
-    ],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
-    noarchive=False,
-)
-
-backend_pyz = PYZ(backend_analysis.pure, backend_analysis.zipped_data, cipher=block_cipher)
-
-backend_exe = EXE(
-    backend_pyz,
-    backend_analysis.scripts,
-    [],
-    exclude_binaries=True,
-    name='CoresAI-Backend',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
-    console=True,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
-)
-
-# Collect everything into a distribution folder
-coll = COLLECT(
-    gui_exe,
-    gui_analysis.binaries,
-    gui_analysis.zipfiles,
-    gui_analysis.datas,
-    backend_exe,
-    backend_analysis.binaries,
-    backend_analysis.zipfiles,
-    backend_analysis.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='CoresAI-Distribution',
-)
-'''
-    
-    with open('CoresAI.spec', 'w') as f:
-        f.write(spec_content)
-    
-    print("✅ Created PyInstaller spec file: CoresAI.spec")
-
-def create_launcher_script():
-    """Create a launcher script to start both backend and GUI"""
-    launcher_content = '''@echo off
-title CoresAI - Advanced AI Assistant
-echo.
-echo 🚀 Starting CoresAI Advanced AI Assistant...
-echo.
-echo ⚡ Initializing backend server...
-start /min "CoresAI Backend" CoresAI-Backend.exe
-
-echo 🔄 Waiting for backend to start...
-timeout /t 3 /nobreak >nul
-
-echo 🖥️  Starting GUI application...
-start "CoresAI GUI" CoresAI-GUI.exe
-
-echo.
-echo ✅ CoresAI is now running!
-echo 📱 GUI: CoresAI main interface
-echo 🌐 Backend: http://localhost:8080
-echo 📚 API Docs: http://localhost:8080/docs
-echo.
-echo Press any key to close this window...
-pause >nul
-'''
-    
-    with open('Start-CoresAI.bat', 'w') as f:
-        f.write(launcher_content)
-    
-    print("✅ Created launcher script: Start-CoresAI.bat")
-
-def create_readme():
-    """Create a distribution README"""
-    readme_content = '''# CoresAI - Advanced AI Assistant
-
-## 🚀 Quick Start
-
-1. Double-click `Start-CoresAI.bat` to launch the complete AI system
-2. The GUI will open automatically with the backend running in the background
-3. Start chatting with your AI assistant!
-
-## 📁 Files Included
-
-- `CoresAI-GUI.exe` - Main graphical interface
-- `CoresAI-Backend.exe` - AI backend server  
-- `Start-CoresAI.bat` - Easy launcher script
-- `test_ai_interface.html` - Web interface (optional)
-- `README.md` - This file
-
-## ✨ Features
-
-🔍 **Web Search & Real-time Data** - Current information from the web
-🧠 **Advanced Reasoning** - Complex problem-solving and analysis  
-💬 **Natural Conversations** - Context-aware dialogue
-📊 **Data Analysis** - Processing and interpreting information
-🎯 **Personalized Assistance** - Adaptive to your specific needs
-
-## 🌐 Web Interface
-
-You can also use the web interface by:
-1. Starting the backend: `CoresAI-Backend.exe`
-2. Opening `test_ai_interface.html` in your browser
-
-## 🔧 Manual Operation
-
-If you prefer to run components separately:
-
-**Backend Only:**
-```
-CoresAI-Backend.exe
-```
-
-**GUI Only:**
-```
-CoresAI-GUI.exe
-```
-
-## 📱 System Requirements
-
-- Windows 10/11
-- 4GB RAM minimum (8GB recommended)
-- Internet connection for web search features
-
-## 🆘 Troubleshooting
-
-**GUI doesn't appear:**
-- Make sure the backend is running first
-- Check Windows Defender/antivirus settings
-- Run as administrator if needed
-
-**Backend connection issues:**
-- Check if port 8080 is available
-- Restart both applications
-- Check firewall settings
-
-## 📞 Support
-
-For support and updates, please refer to the original project documentation.
-
----
-**CoresAI v3.0.0 - Production Ready**
-'''
-    
-    with open('DISTRIBUTION-README.md', 'w') as f:
-        f.write(readme_content)
-    
-    print("✅ Created distribution README: DISTRIBUTION-README.md")
-
-def build_executable():
-    """Build the executable using PyInstaller"""
-    print("🔨 Building CoresAI executable...")
-    print("⏳ This may take several minutes...")
-    
-    try:
-        # Run PyInstaller with the spec file
-        subprocess.check_call([
-            sys.executable, "-m", "PyInstaller", 
-            "--clean", "--noconfirm", "CoresAI.spec"
-        ])
-        print("✅ Build completed successfully!")
-        
-        # Create additional files in the dist folder
-        dist_path = Path("dist/CoresAI-Distribution")
-        if dist_path.exists():
-            # Copy launcher script
-            shutil.copy("Start-CoresAI.bat", dist_path)
-            shutil.copy("DISTRIBUTION-README.md", dist_path / "README.md")
-            shutil.copy("test_ai_interface.html", dist_path)
+        if not os.path.exists(png_path):
+            logger.error(f"PNG file not found: {png_path}")
+            return False
             
-            print(f"📦 Distribution ready in: {dist_path}")
-            print("🎉 Your AI application is ready to distribute!")
-            
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Build failed: {e}")
+        # Open and convert the image
+        img = Image.open(png_path)
+        img.save(ico_path, format='ICO')
+        logger.info(f"Successfully converted {png_path} to {ico_path}")
+        return True
+    except Exception as e:
+        logger.error(f"Error converting PNG to ICO: {str(e)}")
         return False
-    
-    return True
 
-def main():
-    """Main build process"""
-    print("🚀 CoresAI Build Process Starting...")
-    print("=" * 50)
+def create_executable():
+    """Create the CoresAI executable."""
+    try:
+        # Current directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        logger.info(f"Working directory: {current_dir}")
+        
+        # Convert header image to ico
+        png_path = os.path.join(current_dir, "header_image.png")
+        ico_path = os.path.join(current_dir, "coresai.ico")
+        
+        logger.info("Converting header image to icon...")
+        if not convert_png_to_ico(png_path, ico_path):
+            logger.warning("Failed to convert icon, proceeding without custom icon")
+            ico_path = None
+
+        # Create dist directory if it doesn't exist
+        dist_dir = os.path.join(current_dir, "dist")
+        if not os.path.exists(dist_dir):
+            os.makedirs(dist_dir)
+            logger.info(f"Created dist directory: {dist_dir}")
+
+        # Create main.py if it doesn't exist
+        main_path = os.path.join(current_dir, "main.py")
+        if not os.path.exists(main_path):
+            logger.info("Creating main.py entry point...")
+            create_main_file()
+
+        # Define PyInstaller arguments
+        args = [
+            main_path,  # Your main script
+            '--name=CoresAI',
+            '--onefile',  # Create a single executable
+            '--noconsole',  # Don't show console window
+            '--clean',  # Clean cache
+            f'--icon={ico_path}' if ico_path else '',
+            '--add-data=src;src',  # Include source files
+            '--add-data=frontend/build;frontend/build',  # Include frontend build
+            '--add-data=*.json;.',  # Include JSON files
+            '--hidden-import=wmi',
+            '--hidden-import=win32com.client',
+            '--hidden-import=pythoncom',
+            '--hidden-import=discord',
+            '--hidden-import=pandas',
+            '--hidden-import=numpy',
+            '--hidden-import=PIL',
+            '--hidden-import=requests',
+            '--hidden-import=asyncio',
+            '--hidden-import=aiohttp',
+            '--distpath=' + dist_dir,  # Specify dist directory
+            '--workpath=' + os.path.join(current_dir, "build"),  # Specify build directory
+            '--specpath=' + current_dir,  # Specify spec file directory
+        ]
+
+        # Filter out empty arguments
+        args = [arg for arg in args if arg]
+
+        logger.info("Starting PyInstaller build process...")
+        logger.info(f"Build arguments: {' '.join(args)}")
+
+        # Run PyInstaller
+        PyInstaller.__main__.run(args)
+        
+        # Clean up
+        if os.path.exists(ico_path):
+            os.remove(ico_path)
+            logger.info("Cleaned up temporary icon file")
+            
+        # Verify executable was created
+        exe_path = os.path.join(dist_dir, "CoresAI.exe")
+        if os.path.exists(exe_path):
+            logger.info(f"Successfully created executable: {exe_path}")
+            logger.info(f"File size: {os.path.getsize(exe_path) / (1024*1024):.2f} MB")
+        else:
+            logger.error("Failed to create executable!")
+        
+    except Exception as e:
+        logger.error(f"Error creating executable: {str(e)}", exc_info=True)
+        raise
+
+def create_main_file():
+    """Create the main entry point file."""
+    main_content = """import os
+import sys
+import logging
+from src.license_validator import validate_and_activate_key
+from src.discord_channels import setup_discord_channels
+from src.discord_integration import run_discord_bot
+import asyncio
+import tkinter as tk
+from tkinter import messagebox, ttk
+import threading
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class CoresAILauncher:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("CoresAI Launcher")
+        self.root.geometry("400x300")
+        self.setup_ui()
+        
+    def setup_ui(self):
+        # Create main frame
+        main_frame = ttk.Frame(self.root, padding="20")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        # License key entry
+        ttk.Label(main_frame, text="Enter License Key:").grid(row=0, column=0, pady=10)
+        self.key_entry = ttk.Entry(main_frame, width=40)
+        self.key_entry.grid(row=1, column=0, pady=5)
+        
+        # Activate button
+        ttk.Button(main_frame, text="Activate & Launch", 
+                  command=self.activate_and_launch).grid(row=2, column=0, pady=20)
+        
+        # Progress bar
+        self.progress = ttk.Progressbar(main_frame, length=300, mode='indeterminate')
+        self.progress.grid(row=3, column=0, pady=10)
+        
+        # Status label
+        self.status_label = ttk.Label(main_frame, text="")
+        self.status_label.grid(row=4, column=0, pady=10)
+        
+    def activate_and_launch(self):
+        key = self.key_entry.get().strip()
+        if not key:
+            messagebox.showerror("Error", "Please enter a license key")
+            return
+            
+        self.progress.start()
+        self.status_label.config(text="Validating license key...")
+        
+        # Run validation in a separate thread
+        threading.Thread(target=self._validate_and_launch, args=(key,), 
+                       daemon=True).start()
     
-    # Install PyInstaller
-    install_pyinstaller()
+    def _validate_and_launch(self, key):
+        try:
+            # Validate license key
+            success, message = validate_and_activate_key(key)
+            
+            if not success:
+                self.root.after(0, lambda: self._show_error(message))
+                return
+                
+            # Update status
+            self.root.after(0, lambda: self.status_label.config(
+                text="License validated! Starting CoresAI..."))
+            
+            # Start the system
+            self._start_coresai()
+            
+        except Exception as e:
+            self.root.after(0, lambda: self._show_error(str(e)))
+        finally:
+            self.root.after(0, self.progress.stop)
     
-    # Create necessary files
-    create_spec_file()
-    create_launcher_script() 
-    create_readme()
+    def _show_error(self, message):
+        self.progress.stop()
+        self.status_label.config(text="")
+        messagebox.showerror("Error", message)
     
-    # Build the executable
-    if build_executable():
-        print("\n🎉 BUILD SUCCESSFUL!")
-        print("=" * 50)
-        print("📦 Your CoresAI application is ready for distribution!")
-        print("📁 Find it in: dist/CoresAI-Distribution/")
-        print("🚀 Run: Start-CoresAI.bat to test")
-    else:
-        print("\n❌ BUILD FAILED!")
-        print("Please check the error messages above.")
+    def _start_coresai(self):
+        try:
+            # Start Discord bot in a separate thread
+            threading.Thread(target=self._run_discord_bot, 
+                           daemon=True).start()
+            
+            # Start other components here
+            # ...
+            
+            # Update UI
+            self.root.after(0, lambda: self.status_label.config(
+                text="CoresAI is running!"))
+            
+        except Exception as e:
+            self.root.after(0, lambda: self._show_error(f"Error starting CoresAI: {str(e)}"))
+    
+    def _run_discord_bot(self):
+        try:
+            asyncio.run(run_discord_bot())
+        except Exception as e:
+            logger.error(f"Discord bot error: {str(e)}")
+    
+    def run(self):
+        self.root.mainloop()
 
 if __name__ == "__main__":
-    main() 
+    app = CoresAILauncher()
+    app.run()
+"""
+    
+    with open('main.py', 'w') as f:
+        f.write(main_content)
+    logger.info("Created main.py entry point")
+
+if __name__ == "__main__":
+    create_executable() 

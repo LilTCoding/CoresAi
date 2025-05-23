@@ -45,3 +45,23 @@ sphinx-rtd-theme>=2.0.0
 
 # Logging
 structlog>=23.2.0
+
+# Core dependencies
+discord.py>=2.3.2
+pandas>=2.1.0
+numpy>=1.24.0
+requests>=2.31.0
+aiohttp>=3.9.1
+python-dotenv>=1.0.0
+pydantic>=2.5.2
+
+# Hardware fingerprinting
+wmi>=1.5.1
+pywin32>=306
+
+# GUI
+tkinter  # Usually comes with Python
+pillow>=10.0.0  # For image handling
+
+# Building executable
+pyinstaller>=6.2.0
