@@ -1,6 +1,294 @@
 {
   "features": {
     "core": {
+      "ai": {
+        "enabled": true,
+        "description": "Advanced AI processing capabilities",
+        "features": [
+          "real_time_responses",
+          "context_awareness",
+          "multi_backend_support"
+        ]
+      },
+      "server": {
+        "enabled": true,
+        "description": "Game server management system",
+        "features": [
+          "multi_game_support",
+          "file_management",
+          "server_monitoring"
+        ]
+      },
+      "crypto": {
+        "enabled": true,
+        "description": "Cryptocurrency trading and mining",
+        "features": [
+          "wallet_management",
+          "mining_control",
+          "hardware_monitoring"
+        ]
+      },
+      "natural_language_processing": {
+        "enabled": true,
+        "description": "Core NLP capabilities for understanding and generating text",
+        "dependencies": ["llm_backend"],
+        "performance_impact": "medium"
+      },
+      "conversational_ai": {
+        "enabled": true,
+        "description": "Multi-turn conversation capabilities with context awareness",
+        "dependencies": ["llm_backend"],
+        "performance_impact": "medium"
+      },
+      "real_time_responses": {
+        "enabled": true,
+        "description": "Fast response generation for real-time interactions", 
+        "dependencies": ["llm_backend"],
+        "performance_impact": "low"
+      }
+    },
+    "advanced": {
+      "web_search": {
+        "enabled": true,
+        "description": "Real-time web search capabilities for current information",
+        "dependencies": ["production_backend"],
+        "performance_impact": "medium",
+        "config": {
+          "timeout": 5,
+          "max_results": 10,
+          "cache_duration": 300
+        }
+      },
+      "structured_streaming": {
+        "enabled": true,
+        "description": "Advanced streaming with structured object responses",
+        "dependencies": ["streaming_backend"],
+        "performance_impact": "low",
+        "config": {
+          "chunk_size": 1024,
+          "buffer_size": 8192,
+          "timeout": 60
+        }
+      },
+      "creative_software_knowledge": {
+        "enabled": true,
+        "description": "Specialized knowledge for Photoshop, Blender, and VEGAS Pro",
+        "dependencies": ["streaming_backend"],
+        "performance_impact": "low",
+        "supported_software": [
+          "adobe_photoshop",
+          "blender", 
+          "vegas_pro"
+        ]
+      }
+    },
+    "visual": {
+      "face_detection": {
+        "enabled": true,
+        "description": "Real-time face detection using OpenCV",
+        "dependencies": ["opencv", "gui_app"],
+        "performance_impact": "medium",
+        "config": {
+          "camera_index": 0,
+          "detection_interval": 150,
+          "sensitivity": 0.1
+        }
+      },
+      "ai_head_tracking": {
+        "enabled": true,
+        "description": "AI head follows user movement through webcam",
+        "dependencies": ["face_detection", "gui_app"],
+        "performance_impact": "low",
+        "config": {
+          "movement_factor": 0.1,
+          "smooth_movement": true,
+          "bounds_checking": true
+        }
+      },
+      "gui_interface": {
+        "enabled": true,
+        "description": "PyQt5-based graphical user interface",
+        "dependencies": ["PyQt5"],
+        "performance_impact": "medium",
+        "config": {
+          "splash_screen": true,
+          "splash_duration": 2500,
+          "window_size": [1200, 800]
+        }
+      }
+    },
+    "audio": {
+      "voice_synthesis": {
+        "enabled": false,
+        "description": "Text-to-speech using Bark voice models",
+        "dependencies": ["bark", "torch"],
+        "performance_impact": "high",
+        "issues": [
+          "pytorch_compatibility",
+          "numpy_version_conflict",
+          "slow_inference"
+        ],
+        "config": {
+          "use_gpu": false,
+          "use_small_models": true,
+          "preload_models": false
+        }
+      },
+      "voice_cloning": {
+        "enabled": false,
+        "description": "Custom voice generation and cloning",
+        "dependencies": ["voice_synthesis"],
+        "performance_impact": "very_high"
+      }
+    },
+    "streaming_modes": {
+      "object_mode": {
+        "enabled": true,
+        "description": "Stream complete objects progressively",
+        "use_case": "Building structured responses over time",
+        "performance_impact": "low"
+      },
+      "array_mode": {
+        "enabled": true,
+        "description": "Stream array elements individually",
+        "use_case": "Real-time item display as available",
+        "performance_impact": "low"
+      },
+      "no_schema_mode": {
+        "enabled": true,
+        "description": "Free-form JSON without predefined structure",
+        "use_case": "Flexible, dynamic response formats",
+        "performance_impact": "minimal"
+      }
+    },
+    "schema_types": {
+      "general": {
+        "enabled": true,
+        "description": "General-purpose responses for any query",
+        "auto_detect": true
+      },
+      "search": {
+        "enabled": true,
+        "description": "Web search results with structured data",
+        "auto_detect": true,
+        "keywords": ["search", "find", "look up", "latest", "current"]
+      },
+      "notifications": {
+        "enabled": true,
+        "description": "Structured notification items",
+        "auto_detect": true,
+        "keywords": ["notify", "notification", "alert", "remind"]
+      },
+      "tasks": {
+        "enabled": true,
+        "description": "Task items with priorities and time estimates",
+        "auto_detect": true,
+        "keywords": ["task", "todo", "plan", "schedule", "organize"]
+      },
+      "analysis": {
+        "enabled": true,
+        "description": "Structured analysis with findings and recommendations",
+        "auto_detect": true,
+        "keywords": ["analyze", "analysis", "examine", "study", "review"]
+      },
+      "creative_software": {
+        "enabled": true,
+        "description": "Creative software tools and knowledge",
+        "auto_detect": true,
+        "keywords": ["photoshop", "blender", "vegas", "creative", "tool", "brush", "layer", "modeling", "render"]
+      }
+    },
+    "server_management": {
+      "game_servers": {
+        "enabled": true,
+        "description": "Management of game server instances",
+        "supported": [
+          "fivem_qb",
+          "minecraft", 
+          "arma_reforger",
+          "rust"
+        ]
+      },
+      "file_management": {
+        "enabled": true,
+        "description": "File editing and management for game servers",
+        "operations": ["read", "write", "delete", "list"]
+      },
+      "ai_assistance": {
+        "enabled": true,
+        "description": "AI-powered file editing and mod suggestions",
+        "features": ["auto_edit", "mod_suggestions", "code_generation"]
+      }
+    },
+    "development": {
+      "hot_reload": {
+        "enabled": true,
+        "description": "Development mode with hot reloading",
+        "environment": "development"
+      },
+      "debug_mode": {
+        "enabled": false,
+        "description": "Enhanced debugging and logging",
+        "environment": "development"
+      },
+      "test_endpoints": {
+        "enabled": true,
+        "description": "Testing endpoints for development",
+        "environment": "development"
+      }
+    },
+    "security": {
+      "cors_protection": {
+        "enabled": true,
+        "description": "Cross-origin request protection",
+        "config": {
+          "allow_origins": ["*"],
+          "allow_methods": ["GET", "POST"],
+          "allow_headers": ["*"]
+        }
+      },
+      "rate_limiting": {
+        "enabled": false,
+        "description": "Request rate limiting protection",
+        "config": {
+          "requests_per_minute": 100,
+          "burst_size": 20
+        }
+      },
+      "input_validation": {
+        "enabled": true,
+        "description": "Input validation and sanitization",
+        "strict_mode": false
+      }
+    }
+  },
+  "experimental": {
+    "advanced_reasoning": {
+      "enabled": false,
+      "description": "Experimental advanced reasoning capabilities",
+      "stability": "alpha",
+      "performance_impact": "high"
+    },
+    "multimodal_input": {
+      "enabled": false,
+      "description": "Support for image and audio inputs",
+      "stability": "experimental",
+      "performance_impact": "very_high"
+    },
+    "distributed_inference": {
+      "enabled": false,
+      "description": "Distributed AI inference across multiple nodes",
+      "stability": "alpha",
+      "performance_impact": "variable"
+    }
+  },
+  "deprecated": {
+    "legacy_chat": {
+      "enabled": false,
+      "description": "Legacy chat interface (replaced by structured streaming)",
+{
+  "features": {
+    "core": {
       "natural_language_processing": {
         "enabled": true,
         "description": "Core NLP capabilities for understanding and generating text",

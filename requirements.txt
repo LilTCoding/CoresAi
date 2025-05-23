@@ -17,4 +17,4 @@ websockets==10.0
 aiohttp==3.8.1
 cryptography==35.0.0
 pyOpenSSL==21.0.0
-service_identity==21.1.0
+service_identity==21.0.0

@@ -8,7 +8,8 @@ import {
   ServerIcon,
   CpuChipIcon,
   EyeIcon,
-  WrenchScrewdriverIcon
+  WrenchScrewdriverIcon,
+  BeakerIcon
 } from '@heroicons/react/24/outline';
 import { getHealthDetails, HealthResponse } from '../services/api.ts';
 import { motion } from 'framer-motion';
@@ -41,6 +42,21 @@ const features = [
     icon: CubeTransparentIcon,
     href: '/streaming',
     color: 'from-orange-500 to-red-500'
+  },
+  {
+    title: 'Multi-Backend',
+    description: 'Production and streaming backends',
+    icon: ServerIcon
+  },
+  {
+    title: 'AI Processing',
+    description: 'Advanced language model capabilities',
+    icon: BeakerIcon
+  },
+  {
+    title: 'Game Server',
+    description: 'Game server management system',
+    icon: CpuChipIcon
   }
 ];
 

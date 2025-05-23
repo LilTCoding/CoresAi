@@ -21,7 +21,6 @@
     }
   ],
   "features": [
-    "Face Detection & Tracking",
     "Structured Streaming",
     "Creative Software Knowledge",
     "Web Search Integration",
@@ -32,8 +31,7 @@
     "python": "3.8+",
     "key_packages": [
       "fastapi",
-      "PyQt5", 
-      "opencv-python",
+      "PyQt5",
       "numpy",
       "pydantic",
       "requests"

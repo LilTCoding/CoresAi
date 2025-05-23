@@ -56,13 +56,6 @@
       "file_editing",
       "ai_chat"
     ],
-    "face_detection": {
-      "enabled": false,
-      "camera_index": 0,
-      "head_image": "ai_facedetect_head.png",
-      "sensitivity": 0.1,
-      "cascade_file": "haarcascade_frontalface_default.xml"
-    },
     "splash": {
       "enabled": true,
       "image": "dragon_logo.png",

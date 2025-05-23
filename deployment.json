@@ -1,151 +1,73 @@
 {
-  "deployment": {
+  "project": {
+    "name": "CoresAI",
     "version": "4.1.0",
-    "environments": {
-      "development": {
-        "debug": true,
-        "hot_reload": true,
-        "cors_origins": ["*"],
-        "log_level": "DEBUG",
-        "database_url": "sqlite:///dev.db",
-        "voice_models": false
-      },
-      "staging": {
-        "debug": false,
-        "hot_reload": false,
-        "cors_origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
-        "log_level": "INFO",
-        "database_url": "sqlite:///staging.db",
-        "voice_models": false
-      },
-      "production": {
-        "debug": false,
-        "hot_reload": false,
-        "cors_origins": ["https://yourdomain.com"],
-        "log_level": "WARNING",
-        "database_url": "postgresql://user:pass@localhost/coresai",
-        "voice_models": true
-      }
-    }
-  },
-  "docker": {
-    "enabled": true,
-    "base_image": "python:3.11-slim",
-    "port_mappings": {
-      "production": "8080:8080",
-      "streaming": "8081:8081",
-      "voice": "8082:8082"
-    },
-    "volumes": [
-      "./data:/app/data",
-      "./logs:/app/logs",
-      "./models:/app/models"
-    ],
-    "environment_variables": [
-      "PYTHONPATH=/app",
-      "CORS_ORIGINS=${CORS_ORIGINS}",
-      "LOG_LEVEL=${LOG_LEVEL}"
-    ]
-  },
-  "build": {
-    "executable": {
-      "enabled": true,
-      "tool": "pyinstaller",
-      "spec_file": "CoresAI.spec",
-      "output_dir": "dist",
-      "name": "CoresAI-Distribution",
-      "icon": "dragon_logo.png",
-      "one_file": false,
-      "console": false
-    },
-    "installer": {
-      "enabled": true,
-      "create_shortcuts": true,
-      "add_to_path": false,
-      "auto_start": false
-    }
-  },
-  "firewall": {
-    "windows": {
-      "script": "cores.bat",
-      "ports": [8080, 8081, 8082],
-      "protocols": ["TCP", "UDP"],
-      "programs": ["python.exe", "pythonw.exe", "uvicorn.exe"]
-    },
-    "linux": {
-      "tool": "ufw",
-      "commands": [
-        "ufw allow 8080/tcp",
-        "ufw allow 8081/tcp", 
-        "ufw allow 8082/tcp"
-      ]
-    }
+    "description": "Advanced AI System with Multi-Backend Architecture",
+    "author": "Torey",
+    "created": "2024",
+    "license": "MIT"
   },
   "dependencies": {
-    "python": {
-      "version": ">=3.11.0",
-      "requirements_file": "requirements.txt",
-      "virtual_env": "venv"
+    "python": ">=3.8",
+    "fastapi": ">=0.68.1",
+    "uvicorn": ">=0.15.0",
+    "PyQt5": ">=5.15.4",
+    "requests": ">=2.26.0",
+    "pydantic": ">=1.8.2",
+    "numpy": ">=1.21.2",
+    "psutil": ">=5.8.0",
+    "wmi": ">=1.5.1",
+    "sounddevice": ">=0.4.3",
+    "soundfile": ">=0.10.3",
+    "multiprocessing-logging": ">=0.3.1",
+    "python-multipart": ">=0.0.5",
+    "aiofiles": ">=0.7.0",
+    "python-jose[cryptography]": ">=3.3.0",
+    "passlib[bcrypt]": ">=1.7.4",
+    "websockets": ">=10.0",
+    "aiohttp": ">=3.8.1",
+    "cryptography": ">=35.0.0",
+    "pyOpenSSL": ">=21.0.0",
+    "service_identity": ">=21.0.0"
+  },
+  "deployment": {
+    "production": {
+      "host": "0.0.0.0",
+      "port": 8082,
+      "workers": 4,
+      "timeout": 30,
+      "ssl": false,
+      "cors_origins": ["*"],
+      "log_level": "info"
     },
-    "system": {
-      "opencv": ">=4.8.0",
-      "ffmpeg": "optional",
-      "cuda": "optional"
+    "streaming": {
+      "host": "0.0.0.0",
+      "port": 8081,
+      "workers": 2,
+      "timeout": 60,
+      "ssl": false,
+      "cors_origins": ["*"],
+      "log_level": "info"
+    },
+    "simple": {
+      "host": "0.0.0.0",
+      "port": 8080,
+      "workers": 1,
+      "timeout": 15,
+      "ssl": false,
+      "cors_origins": ["*"],
+      "log_level": "info"
     }
   },
-  "monitoring": {
-    "health_checks": {
-      "production_backend": "http://localhost:8080/health",
-      "streaming_backend": "http://localhost:8081/health"
-    },
-    "metrics": {
-      "enabled": false,
-      "endpoint": "/metrics",
-      "format": "prometheus"
-    },
-    "logging": {
-      "centralized": false,
-      "format": "json",
-      "rotation": "daily"
-    }
-  },
-  "backup": {
-    "enabled": false,
-    "schedule": "daily",
-    "retention": "30d",
-    "paths": [
-      "./data",
-      "./logs",
-      "./models/saved"
-    ],
-    "destination": "./backups"
-  },
-  "scaling": {
-    "horizontal": {
-      "enabled": false,
-      "load_balancer": "nginx",
-      "instances": 1
-    },
-    "vertical": {
-      "cpu_cores": 4,
-      "memory_gb": 8,
-      "gpu": false
-    }
-  },
-  "security": {
-    "ssl": {
-      "enabled": false,
-      "cert_file": "",
-      "key_file": ""
-    },
-    "authentication": {
-      "enabled": false,
-      "method": "jwt",
-      "secret_key": ""
-    },
-    "rate_limiting": {
-      "enabled": false,
-      "requests_per_minute": 100
-    }
+  "features": {
+    "web_search": true,
+    "enhanced_reasoning": true,
+    "real_time_data": true,
+    "advanced_ai": true,
+    "structured_streaming": true,
+    "object_mode": true,
+    "array_mode": true,
+    "no_schema_mode": true,
+    "creative_software_knowledge": true
   }
 } 

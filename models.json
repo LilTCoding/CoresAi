@@ -1,91 +1,18 @@
 {
   "models": {
-    "face_detection": {
-      "name": "OpenCV Haar Cascade",
-      "type": "computer_vision",
-      "framework": "opencv",
-      "version": "4.8.0",
-      "model_file": "haarcascade_frontalface_default.xml",
-      "enabled": true,
-      "config": {
-        "scale_factor": 1.3,
-        "min_neighbors": 5,
-        "min_size": [30, 30],
-        "camera_index": 0,
-        "resolution": [320, 240],
-        "fps": 30,
-        "sensitivity": 0.1
-      },
-      "capabilities": [
-        "face_detection",
-        "real_time_tracking",
-        "head_movement_following"
-      ],
-      "performance": {
-        "cpu_usage": "low",
-        "memory_usage": "minimal",
-        "gpu_required": false,
-        "real_time": true
-      }
+    "llm": {
+      "name": "GPT-3.5-Turbo",
+      "version": "0.3.0",
+      "framework": "openai",
+      "type": "language",
+      "status": "active"
     },
-    "voice_processor": {
-      "name": "Bark Voice Synthesis", 
-      "type": "text_to_speech",
-      "framework": "bark",
-      "version": "latest",
-      "enabled": false,
-      "config": {
-        "use_gpu": false,
-        "use_small": true,
-        "preload_models": false,
-        "voice_preset": "v2/en_speaker_6",
-        "generation_temperature": 0.6
-      },
-      "capabilities": [
-        "text_to_speech",
-        "voice_cloning",
-        "multilingual_support"
-      ],
-      "performance": {
-        "cpu_usage": "high",
-        "memory_usage": "high", 
-        "gpu_required": false,
-        "real_time": false
-      },
-      "issues": [
-        "pytorch_2.6_compatibility",
-        "numpy_version_conflict",
-        "slow_cpu_inference"
-      ]
-    },
-    "llm_backend": {
-      "name": "CoresAI Language Model",
-      "type": "large_language_model",
-      "framework": "custom",
-      "version": "4.1.0",
-      "enabled": true,
-      "config": {
-        "max_tokens": 2048,
-        "temperature": 0.7,
-        "top_p": 0.9,
-        "frequency_penalty": 0.0,
-        "presence_penalty": 0.0,
-        "context_window": 4096
-      },
-      "capabilities": [
-        "natural_language_understanding",
-        "conversational_ai",
-        "web_search_integration",
-        "structured_streaming",
-        "creative_software_knowledge",
-        "real_time_responses"
-      ],
-      "performance": {
-        "cpu_usage": "medium",
-        "memory_usage": "medium",
-        "gpu_required": false,
-        "real_time": true
-      }
+    "voice": {
+      "name": "Bark",
+      "version": "0.1.0", 
+      "framework": "pytorch",
+      "type": "audio",
+      "status": "disabled"
     }
   },
   "creative_software_knowledge": {
