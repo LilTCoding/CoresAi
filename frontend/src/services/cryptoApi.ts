@@ -909,6 +909,18 @@ export const getMiningSchedule = async (): Promise<MiningSchedule | null> => {
   }
 };
 
+// --- Crypto Pool System API ---
+export const createPool = async (data: any) => cryptoApi.post('/api/v1/pools/create', data);
+export const inviteToPool = async (data: any) => cryptoApi.post('/api/v1/pools/invite', data);
+export const joinPool = async (data: any) => cryptoApi.post('/api/v1/pools/join', data);
+export const getPoolStatus = async (poolId: string) => cryptoApi.get(`/api/v1/pools/status/${poolId}`);
+export const executePoolTrade = async (data: any) => cryptoApi.post('/api/v1/pools/trade', data);
+export const depositToPool = async (data: any) => cryptoApi.post('/api/v1/pools/deposit', data);
+export const withdrawFromPool = async (data: any) => cryptoApi.post('/api/v1/pools/withdraw', data);
+export const getPoolLogs = async (poolId: string) => cryptoApi.get(`/api/v1/pools/logs/${poolId}`);
+export const spinBoost = async (poolId: string) => cryptoApi.post(`/api/v1/pools/boost/spin`, { poolId });
+export const getBoostStatus = async (poolId: string) => cryptoApi.get(`/api/v1/pools/boost/status/${poolId}`);
+
 export default {
   connectWallet,
   disconnectWallet,
@@ -938,5 +950,15 @@ export default {
   benchmarkHardware,
   getAIMiningRecommendations,
   setMiningSchedule,
-  getMiningSchedule
+  getMiningSchedule,
+  createPool,
+  inviteToPool,
+  joinPool,
+  getPoolStatus,
+  executePoolTrade,
+  depositToPool,
+  withdrawFromPool,
+  getPoolLogs,
+  spinBoost,
+  getBoostStatus
 }; 

@@ -16,7 +16,7 @@ from dataclasses import dataclass, asdict
 from decimal import Decimal
 import os
 
-from fastapi import FastAPI, HTTPException, Depends, Security, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Depends, Security, BackgroundTasks, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
@@ -1257,6 +1257,118 @@ async def get_supported_algorithms():
     except Exception as e:
         logger.error(f"Error getting algorithms: {e}")
         raise HTTPException(status_code=500, detail="Failed to get algorithms")
+
+# --- Crypto Pool System ---
+pools = {}
+pool_boosts = {}
+
+@app.post("/api/v1/pools/create")
+async def create_pool(data: dict = Body(...)):
+    """Create a new crypto pool"""
+    pool_id = str(len(pools) + 1)
+    pools[pool_id] = {
+        "id": pool_id,
+        "name": data.get("name", f"Pool {pool_id}"),
+        "privacy": data.get("privacy", "private"),
+        "split_mode": data.get("split_mode", "equal"),
+        "members": [data.get("creator")],
+        "size": 0,
+        "return_pct": 0,
+        "trades": [],
+        "logs": [],
+    }
+    return {"success": True, "pool_id": pool_id, "pool": pools[pool_id]}
+
+@app.post("/api/v1/pools/invite")
+async def invite_to_pool(data: dict = Body(...)):
+    """Invite a user to a pool"""
+    pool_id = data["pool_id"]
+    address = data["address"]
+    pools[pool_id]["members"].append(address)
+    pools[pool_id]["logs"].append({"action": "invite", "address": address})
+    return {"success": True}
+
+@app.post("/api/v1/pools/join")
+async def join_pool(data: dict = Body(...)):
+    """Join a pool (public or with invite)"""
+    pool_id = data["pool_id"]
+    address = data["address"]
+    pools[pool_id]["members"].append(address)
+    pools[pool_id]["logs"].append({"action": "join", "address": address})
+    return {"success": True}
+
+@app.get("/api/v1/pools/status/{pool_id}")
+async def get_pool_status(pool_id: str):
+    """Get pool status (size, members, trades, P/L, payouts)"""
+    return pools.get(pool_id, {})
+
+@app.post("/api/v1/pools/trade")
+async def execute_pool_trade(data: dict = Body(...)):
+    """Execute a trade for the pool"""
+    pool_id = data["pool_id"]
+    trade = data["trade"]
+    pools[pool_id]["trades"].append(trade)
+    pools[pool_id]["logs"].append({"action": "trade", "trade": trade})
+    return {"success": True}
+
+@app.post("/api/v1/pools/deposit")
+async def deposit_to_pool(data: dict = Body(...)):
+    """Deposit funds to the pool"""
+    pool_id = data["pool_id"]
+    amount = data["amount"]
+    pools[pool_id]["size"] += amount
+    pools[pool_id]["logs"].append({"action": "deposit", "amount": amount})
+    return {"success": True}
+
+@app.post("/api/v1/pools/withdraw")
+async def withdraw_from_pool(data: dict = Body(...)):
+    """Withdraw funds from the pool"""
+    pool_id = data["pool_id"]
+    amount = data["amount"]
+    pools[pool_id]["size"] -= amount
+    pools[pool_id]["logs"].append({"action": "withdraw", "amount": amount})
+    return {"success": True}
+
+@app.get("/api/v1/pools/logs/{pool_id}")
+async def get_pool_logs(pool_id: str):
+    """Get full action log for the pool"""
+    return {"logs": pools.get(pool_id, {}).get("logs", [])}
+
+# --- Boost Spinner Logic ---
+import random, time
+
+@app.post("/api/v1/pools/boost/spin")
+async def spin_boost(data: dict = Body(...)):
+    """Spin the boost wheel (host only, once per 14 days)"""
+    pool_id = data["pool_id"]
+    now = int(time.time())
+    last_spin = pool_boosts.get(pool_id, {}).get("last_spin", 0)
+    if now - last_spin < 14 * 24 * 3600:
+        return {"success": False, "error": "Spin not available yet"}
+    boost_values = [250, 300, 450, 500]
+    boost = random.choice(boost_values)
+    pool_boosts[pool_id] = {
+        "boost": boost,
+        "last_spin": now,
+        "boost_ends": now + 7 * 24 * 3600
+    }
+    pools[pool_id]["logs"].append({"action": "boost_spin", "boost": boost})
+    return {"success": True, "boost": boost}
+
+@app.get("/api/v1/pools/boost/status/{pool_id}")
+async def get_boost_status(pool_id: str):
+    """Get current boost, countdown, and bonus generated"""
+    boost_info = pool_boosts.get(pool_id, {})
+    now = int(time.time())
+    countdown = max(0, (boost_info.get("last_spin", 0) + 14 * 24 * 3600) - now)
+    boost_active = now < boost_info.get("boost_ends", 0)
+    boost_ends_in = max(0, boost_info.get("boost_ends", 0) - now)
+    return {
+        "boost": boost_info.get("boost"),
+        "boost_active": boost_active,
+        "boost_ends_in": boost_ends_in,
+        "countdown": countdown
+    }
 
 # Run the server
 if __name__ == "__main__":

@@ -57,6 +57,7 @@ import {
   MiningPool,
   AIRecommendation
 } from '../services/cryptoApi';
+import CryptoPoolsDashboard from '../components/CryptoPoolsDashboard';
 
 interface ActiveTab {
   tab: 'trading' | 'friends' | 'mining' | 'pools';
@@ -1175,66 +1176,7 @@ const CryptoTrading: React.FC = () => {
 
       {/* Crypto Pools Tab */}
       {activeTab === 'pools' && (
-        <motion.div 
-          className="space-y-8"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Pool Management */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-              <CogIcon className="h-6 w-6 mr-3 text-cyan-400" />
-              Pool Management
-            </h2>
-            
-            <div className="space-y-4">
-              <button
-                onClick={() => setPoolCreateMode(true)}
-                className="w-full py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
-              >
-                Create New Pool
-              </button>
-            </div>
-          </div>
-
-          {/* Pool List */}
-          <div className="space-y-4">
-            {userPools.map((pool, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div>
-                  <div className="text-white font-medium">{pool.name}</div>
-                  <div className="text-slate-400 text-sm">{pool.description}</div>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => setSelectedCryptoPool(pool)}
-                    className="px-3 py-1 bg-green-500/20 text-green-400 rounded text-sm hover:bg-green-500/30 transition-colors"
-                  >
-                    Manage
-                  </button>
-                  <button
-                    onClick={() => removeFriendWallet(pool.address)}
-                    className="px-3 py-1 bg-red-500/20 text-red-400 rounded text-sm hover:bg-red-500/30 transition-colors"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Empty State */}
-          {userPools.length === 0 && (
-            <div className="text-center py-12">
-              <div className="inline-flex p-4 rounded-full bg-slate-700/50 mb-4">
-                <UsersIcon className="h-12 w-12 text-slate-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">No Crypto Pools Added</h3>
-              <p className="text-slate-400 mb-6">Start managing your crypto pools by creating new ones</p>
-            </div>
-          )}
-        </motion.div>
+        <CryptoPoolsDashboard />
       )}
     </div>
   );
