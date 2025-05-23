@@ -1,42 +1,41 @@
-# Advanced AI System
+# CoresAi: Advanced AI Crypto Trading Assistant
 
-This project implements a sophisticated AI system with multiple capabilities including natural language processing, machine learning, and deep learning features.
+CoresAi is an advanced AI-driven crypto trading assistant that offers a comprehensive suite of features for live trading, portfolio management, AI signals, and more. The latest addition is the Crypto Pool system, which allows users to create and manage crypto trading pools with innovative features like the Boost Spinner widget.
 
 ## Features
 
-- Natural Language Processing (NLP) capabilities
-- Deep Learning models using PyTorch and TensorFlow
-- Machine Learning algorithms with scikit-learn
-- REST API interface using FastAPI
-- Integration with OpenAI's GPT models
-- Data processing and analysis tools
+- **Live Trading**: Execute trades in real-time with AI-driven insights.
+- **Portfolio Dashboards**: Visualize and manage your crypto assets.
+- **AI Signals**: Receive AI-generated trading signals to optimize your strategy.
+- **Friend Earnings Tracker**: Monitor and compare earnings with friends.
+- **Crypto Pool System**: Create and manage trading pools, invite members, and utilize the Boost Spinner for earnings boosts.
 
 ## Setup
 
-1. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+1. **Create a virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   npm install
+   ```
 
-3. Create a `.env` file with your API keys:
-```
-OPENAI_API_KEY=your_api_key_here
-```
+3. **Create a `.env` file with your API keys**:
+   ```
+   OPENAI_API_KEY=your_api_key_here
+   INFURA_PROJECT_ID=your_infura_project_id
+   ```
 
 ## Project Structure
 
 ```
-├── src/
-│   ├── models/         # AI model implementations
-│   ├── api/           # FastAPI endpoints
-│   ├── utils/         # Utility functions
-│   └── config/        # Configuration files
+├── frontend/          # React frontend components
+├── backend/           # FastAPI backend services
+├── contracts/         # Solidity smart contracts
 ├── tests/             # Test files
 ├── data/              # Data storage
 └── notebooks/         # Jupyter notebooks for experiments
@@ -44,15 +43,18 @@ OPENAI_API_KEY=your_api_key_here
 
 ## Usage
 
-1. Start the API server:
-```bash
-uvicorn src.api.main:app --reload
-```
+1. **Start the API server**:
+   ```bash
+   uvicorn backend.main:app --reload
+   ```
 
-2. Access the API documentation at `http://localhost:8080/docs`
+2. **Start the React frontend**:
+   ```bash
+   npm start
+   ```
 
-- The GUI suppresses DeprecationWarnings for a cleaner experience.
+3. **Access the API documentation** at `http://localhost:8000/docs`
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests! 
+We welcome contributions! Feel free to submit issues and enhancement requests. 
