@@ -1,0 +1,48 @@
+{
+  "name": "CoresAI",
+  "version": "4.1.0",
+  "description": "Advanced AI System with Multi-Backend Architecture",
+  "author": "Torey",
+  "created": "2024",
+  "license": "MIT",
+  "status": "active",
+  "backends": [
+    {
+      "name": "Production Backend",
+      "file": "production_ai_backend.py",
+      "port": 8080,
+      "status": "active"
+    },
+    {
+      "name": "Streaming Backend", 
+      "file": "streaming_ai_backend.py",
+      "port": 8081,
+      "status": "active"
+    }
+  ],
+  "features": [
+    "Face Detection & Tracking",
+    "Structured Streaming",
+    "Creative Software Knowledge",
+    "Web Search Integration",
+    "PyQt5 GUI Interface",
+    "Real-time AI Responses"
+  ],
+  "requirements": {
+    "python": "3.8+",
+    "key_packages": [
+      "fastapi",
+      "PyQt5", 
+      "opencv-python",
+      "numpy",
+      "pydantic",
+      "requests"
+    ]
+  },
+  "setup": {
+    "install": "pip install -r requirements.txt",
+    "configure": "python fix_all_issues.py",
+    "start": "python gui_app.py",
+    "firewall": "cores.bat"
+  }
+} 

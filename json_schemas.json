@@ -1,0 +1,480 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CoresAI API Schemas",
+  "description": "JSON schemas for CoresAI API request and response validation",
+  "definitions": {
+    "Message": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["user", "assistant", "system"]
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        }
+      },
+      "required": ["role", "content"],
+      "additionalProperties": false
+    },
+    "ChatRequest": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message"
+          },
+          "minItems": 1,
+          "maxItems": 50
+        }
+      },
+      "required": ["messages"],
+      "additionalProperties": false
+    },
+    "ChatResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message"
+          }
+        }
+      },
+      "required": ["messages"],
+      "additionalProperties": false
+    },
+    "StreamingRequest": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message"
+          },
+          "minItems": 1,
+          "maxItems": 50
+        },
+        "output_mode": {
+          "type": "string",
+          "enum": ["object", "array", "no-schema"],
+          "default": "object"
+        },
+        "schema_type": {
+          "type": "string",
+          "enum": ["general", "search", "notifications", "tasks", "analysis", "creative_software"],
+          "default": "general"
+        },
+        "context": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "required": ["messages"],
+      "additionalProperties": false
+    },
+    "StreamingChunk": {
+      "type": "object",
+      "properties": {
+        "chunk_type": {
+          "type": "string",
+          "enum": ["partial", "complete", "error"]
+        },
+        "data": {
+          "type": "object"
+        },
+        "chunk_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "is_final": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": ["chunk_type", "data", "chunk_index"],
+      "additionalProperties": false
+    },
+    "SearchResult": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "snippet": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 500
+        },
+        "relevance_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": ["title", "snippet", "url", "relevance_score"],
+      "additionalProperties": false
+    },
+    "WebSearchResponse": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SearchResult"
+          },
+          "maxItems": 20
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      },
+      "required": ["query", "results", "summary"],
+      "additionalProperties": false
+    },
+    "Notification": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        }
+      },
+      "required": ["name", "message", "timestamp", "priority"],
+      "additionalProperties": false
+    },
+    "TaskItem": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "estimated_time": {
+          "type": "string",
+          "pattern": "^\\d+\\s+(minutes?|hours?|days?)$"
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "required": ["title", "description", "priority", "estimated_time", "category"],
+      "additionalProperties": false
+    },
+    "AnalysisPoint": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "finding": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "implications": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "required": ["category", "finding", "confidence", "implications"],
+      "additionalProperties": false
+    },
+    "StructuredAnalysis": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "key_points": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AnalysisPoint"
+          },
+          "maxItems": 10
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "maxItems": 10
+        },
+        "confidence_level": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": ["topic", "summary", "key_points", "recommendations", "confidence_level"],
+      "additionalProperties": false
+    },
+    "SoftwareTool": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "shortcut": {
+          "type": ["string", "null"],
+          "maxLength": 20
+        },
+        "function": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "how_it_works": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "required": ["name", "function", "how_it_works", "category"],
+      "additionalProperties": false
+    },
+    "SoftwareWorkspace": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "how_it_works": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "software": {
+          "type": "string",
+          "enum": ["Photoshop", "Blender", "VEGAS Pro"]
+        }
+      },
+      "required": ["name", "purpose", "how_it_works", "software"],
+      "additionalProperties": false
+    },
+    "CreativeTechnique": {
+      "type": "object",
+      "properties": {
+        "technique": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "software": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "minItems": 1,
+          "maxItems": 20
+        },
+        "technical_details": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "required": ["technique", "description", "software", "steps", "technical_details"],
+      "additionalProperties": false
+    },
+    "SoftwareKnowledgeResponse": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "software_focus": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SoftwareTool"
+          },
+          "maxItems": 20
+        },
+        "workspaces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SoftwareWorkspace"
+          },
+          "maxItems": 10
+        },
+        "techniques": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreativeTechnique"
+          },
+          "maxItems": 10
+        },
+        "common_concepts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "maxItems": 10
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": ["query", "software_focus", "tools", "workspaces", "techniques", "common_concepts", "summary"],
+      "additionalProperties": false
+    },
+    "HealthResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["healthy", "unhealthy", "degraded"]
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "maxItems": 20
+        },
+        "uptime": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": ["status", "message"],
+      "additionalProperties": false
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer",
+              "minimum": 400,
+              "maximum": 599
+            },
+            "message": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "details": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": ["code", "message"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["error"],
+      "additionalProperties": false
+    }
+  }
+} 

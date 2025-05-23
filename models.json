@@ -1,0 +1,179 @@
+{
+  "models": {
+    "face_detection": {
+      "name": "OpenCV Haar Cascade",
+      "type": "computer_vision",
+      "framework": "opencv",
+      "version": "4.8.0",
+      "model_file": "haarcascade_frontalface_default.xml",
+      "enabled": true,
+      "config": {
+        "scale_factor": 1.3,
+        "min_neighbors": 5,
+        "min_size": [30, 30],
+        "camera_index": 0,
+        "resolution": [320, 240],
+        "fps": 30,
+        "sensitivity": 0.1
+      },
+      "capabilities": [
+        "face_detection",
+        "real_time_tracking",
+        "head_movement_following"
+      ],
+      "performance": {
+        "cpu_usage": "low",
+        "memory_usage": "minimal",
+        "gpu_required": false,
+        "real_time": true
+      }
+    },
+    "voice_processor": {
+      "name": "Bark Voice Synthesis", 
+      "type": "text_to_speech",
+      "framework": "bark",
+      "version": "latest",
+      "enabled": false,
+      "config": {
+        "use_gpu": false,
+        "use_small": true,
+        "preload_models": false,
+        "voice_preset": "v2/en_speaker_6",
+        "generation_temperature": 0.6
+      },
+      "capabilities": [
+        "text_to_speech",
+        "voice_cloning",
+        "multilingual_support"
+      ],
+      "performance": {
+        "cpu_usage": "high",
+        "memory_usage": "high", 
+        "gpu_required": false,
+        "real_time": false
+      },
+      "issues": [
+        "pytorch_2.6_compatibility",
+        "numpy_version_conflict",
+        "slow_cpu_inference"
+      ]
+    },
+    "llm_backend": {
+      "name": "CoresAI Language Model",
+      "type": "large_language_model",
+      "framework": "custom",
+      "version": "4.1.0",
+      "enabled": true,
+      "config": {
+        "max_tokens": 2048,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0,
+        "context_window": 4096
+      },
+      "capabilities": [
+        "natural_language_understanding",
+        "conversational_ai",
+        "web_search_integration",
+        "structured_streaming",
+        "creative_software_knowledge",
+        "real_time_responses"
+      ],
+      "performance": {
+        "cpu_usage": "medium",
+        "memory_usage": "medium",
+        "gpu_required": false,
+        "real_time": true
+      }
+    }
+  },
+  "creative_software_knowledge": {
+    "photoshop": {
+      "tools": {
+        "count": 15,
+        "categories": ["selection", "painting", "transformation", "repair", "vector"],
+        "database": "embedded",
+        "last_updated": "2024"
+      },
+      "workspaces": {
+        "count": 8,
+        "types": ["essentials", "photography", "painting", "design"],
+        "customizable": true
+      }
+    },
+    "blender": {
+      "workspaces": {
+        "count": 8,
+        "types": ["modeling", "sculpting", "shading", "animation", "rendering"],
+        "database": "embedded"
+      },
+      "tools": {
+        "modeling_tools": 20,
+        "sculpting_brushes": 15,
+        "shading_nodes": 50
+      }
+    },
+    "vegas_pro": {
+      "tools": {
+        "count": 12,
+        "categories": ["editing", "effects", "audio", "color"],
+        "database": "embedded"
+      },
+      "effects": {
+        "video_fx": 200,
+        "audio_fx": 50,
+        "transitions": 30
+      }
+    }
+  },
+  "training": {
+    "datasets": {
+      "creative_software": {
+        "sources": [
+          "official_documentation",
+          "community_tutorials", 
+          "expert_knowledge"
+        ],
+        "size": "10MB",
+        "format": "json",
+        "last_updated": "2024"
+      },
+      "conversation": {
+        "sources": ["synthetic_data", "user_interactions"],
+        "size": "50MB",
+        "format": "jsonl"
+      }
+    },
+    "fine_tuning": {
+      "enabled": false,
+      "last_run": null,
+      "epochs": 10,
+      "learning_rate": 0.0001
+    }
+  },
+  "model_paths": {
+    "pretrained": "./models/pretrained/",
+    "saved": "./models/saved/",
+    "cache": "./models/cache/",
+    "downloads": "./models/downloads/"
+  },
+  "memory_management": {
+    "model_caching": true,
+    "lazy_loading": true,
+    "memory_limit": "4GB",
+    "cleanup_interval": "1h"
+  },
+  "inference": {
+    "batch_size": 1,
+    "max_concurrent": 5,
+    "timeout": 30,
+    "retry_attempts": 3
+  },
+  "monitoring": {
+    "performance_tracking": true,
+    "error_logging": true,
+    "usage_statistics": false,
+    "model_health_checks": true
+  }
+} 

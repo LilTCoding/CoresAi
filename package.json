@@ -1,0 +1,53 @@
+{
+  "name": "coresai",
+  "version": "4.1.0",
+  "description": "Advanced AI System with Multi-Backend Architecture and React Frontend",
+  "main": "production_ai_backend.py",
+  "scripts": {
+    "start": "python production_ai_backend.py",
+    "start:streaming": "python streaming_ai_backend.py",
+    "start:simple": "python simple_backend.py",
+    "start:gui": "python gui_app.py",
+    "start:all": "concurrently \"npm run start\" \"npm run start:streaming\"",
+    "build:exe": "python build_exe.py",
+    "test:streaming": "python test_streaming.py",
+    "test:creative": "python test_creative_software.py",
+    "frontend:install": "cd frontend && npm install",
+    "frontend:start": "cd frontend && npm start",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:test": "cd frontend && npm test",
+    "deploy:vercel": "cd frontend && vercel --prod",
+    "setup": "npm run frontend:install",
+    "build": "npm run frontend:build"
+  },
+  "keywords": [
+    "ai",
+    "assistant",
+    "fastapi",
+    "react",
+    "streaming",
+    "web-search",
+    "creative-software",
+    "face-detection"
+  ],
+  "author": "CoresAI Team",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "python": ">=3.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/coresai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/coresai/issues"
+  },
+  "homepage": "https://github.com/yourusername/coresai#readme"
+} 

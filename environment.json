@@ -1,0 +1,286 @@
+{
+  "environments": {
+    "development": {
+      "name": "Development",
+      "description": "Local development environment with debugging enabled",
+      "active": true,
+      "config": {
+        "debug": true,
+        "hot_reload": true,
+        "log_level": "DEBUG",
+        "cors_origins": ["*"],
+        "rate_limiting": false,
+        "ssl": false,
+        "database": {
+          "type": "sqlite",
+          "path": "./data/dev.db",
+          "echo": true
+        },
+        "redis": {
+          "enabled": false,
+          "url": "redis://localhost:6379/0"
+        },
+        "monitoring": {
+          "enabled": false,
+          "metrics": false,
+          "tracing": false
+        }
+      },
+      "features": {
+        "voice_synthesis": false,
+        "face_detection": true,
+        "streaming": true,
+        "creative_software": true,
+        "web_search": true
+      },
+      "ports": {
+        "production": 8080,
+        "streaming": 8081,
+        "voice": 8082
+      },
+      "paths": {
+        "data": "./data",
+        "logs": "./logs",
+        "models": "./models",
+        "cache": "./cache"
+      }
+    },
+    "staging": {
+      "name": "Staging",
+      "description": "Pre-production testing environment",
+      "active": false,
+      "config": {
+        "debug": false,
+        "hot_reload": false,
+        "log_level": "INFO",
+        "cors_origins": [
+          "http://localhost:3000",
+          "http://127.0.0.1:3000",
+          "https://staging.coresai.com"
+        ],
+        "rate_limiting": true,
+        "ssl": false,
+        "database": {
+          "type": "postgresql",
+          "host": "localhost",
+          "port": 5432,
+          "name": "coresai_staging",
+          "user": "coresai_user",
+          "echo": false
+        },
+        "redis": {
+          "enabled": true,
+          "url": "redis://localhost:6379/1"
+        },
+        "monitoring": {
+          "enabled": true,
+          "metrics": true,
+          "tracing": true
+        }
+      },
+      "features": {
+        "voice_synthesis": false,
+        "face_detection": true,
+        "streaming": true,
+        "creative_software": true,
+        "web_search": true
+      },
+      "ports": {
+        "production": 8080,
+        "streaming": 8081,
+        "voice": 8082
+      },
+      "paths": {
+        "data": "/app/data",
+        "logs": "/app/logs",
+        "models": "/app/models",
+        "cache": "/tmp/cache"
+      }
+    },
+    "production": {
+      "name": "Production",
+      "description": "Live production environment",
+      "active": false,
+      "config": {
+        "debug": false,
+        "hot_reload": false,
+        "log_level": "WARNING",
+        "cors_origins": [
+          "https://coresai.com",
+          "https://www.coresai.com",
+          "https://app.coresai.com"
+        ],
+        "rate_limiting": true,
+        "ssl": true,
+        "database": {
+          "type": "postgresql",
+          "host": "db.coresai.com",
+          "port": 5432,
+          "name": "coresai_prod",
+          "user": "coresai_prod_user",
+          "pool_size": 20,
+          "echo": false
+        },
+        "redis": {
+          "enabled": true,
+          "url": "redis://cache.coresai.com:6379/0",
+          "cluster": true
+        },
+        "monitoring": {
+          "enabled": true,
+          "metrics": true,
+          "tracing": true,
+          "alerts": true
+        }
+      },
+      "features": {
+        "voice_synthesis": true,
+        "face_detection": true,
+        "streaming": true,
+        "creative_software": true,
+        "web_search": true
+      },
+      "ports": {
+        "production": 8080,
+        "streaming": 8081,
+        "voice": 8082
+      },
+      "paths": {
+        "data": "/app/data",
+        "logs": "/app/logs",
+        "models": "/app/models",
+        "cache": "/app/cache"
+      },
+      "scaling": {
+        "replicas": 3,
+        "load_balancer": "nginx",
+        "auto_scaling": true,
+        "max_replicas": 10
+      }
+    },
+    "testing": {
+      "name": "Testing",
+      "description": "Automated testing environment",
+      "active": false,
+      "config": {
+        "debug": false,
+        "hot_reload": false,
+        "log_level": "ERROR",
+        "cors_origins": ["*"],
+        "rate_limiting": false,
+        "ssl": false,
+        "database": {
+          "type": "sqlite",
+          "path": ":memory:",
+          "echo": false
+        },
+        "redis": {
+          "enabled": false
+        },
+        "monitoring": {
+          "enabled": false
+        }
+      },
+      "features": {
+        "voice_synthesis": false,
+        "face_detection": false,
+        "streaming": true,
+        "creative_software": true,
+        "web_search": false
+      },
+      "ports": {
+        "production": 8080,
+        "streaming": 8081,
+        "voice": 8082
+      },
+      "paths": {
+        "data": "./test_data",
+        "logs": "./test_logs",
+        "models": "./test_models",
+        "cache": "./test_cache"
+      }
+    }
+  },
+  "shared": {
+    "api_version": "v1",
+    "timeout": {
+      "default": 30,
+      "streaming": 60,
+      "voice": 120
+    },
+    "limits": {
+      "max_request_size": "10MB",
+      "max_file_size": "50MB",
+      "max_concurrent_requests": 100
+    },
+    "security": {
+      "secret_key": "${SECRET_KEY}",
+      "jwt_algorithm": "HS256",
+      "jwt_expiry": 3600,
+      "password_hash_rounds": 12
+    },
+    "external_apis": {
+      "web_search": {
+        "provider": "custom",
+        "timeout": 5,
+        "max_results": 10
+      },
+      "voice_models": {
+        "provider": "bark",
+        "cache_models": true,
+        "gpu_acceleration": false
+      }
+    }
+  },
+  "overrides": {
+    "windows": {
+      "paths": {
+        "data": ".\\data",
+        "logs": ".\\logs",
+        "models": ".\\models",
+        "cache": ".\\cache"
+      },
+      "firewall": {
+        "script": "cores.bat",
+        "auto_configure": true
+      }
+    },
+    "linux": {
+      "paths": {
+        "data": "./data",
+        "logs": "./logs",
+        "models": "./models",
+        "cache": "./cache"
+      },
+      "firewall": {
+        "tool": "ufw",
+        "auto_configure": false
+      }
+    },
+    "docker": {
+      "paths": {
+        "data": "/app/data",
+        "logs": "/app/logs",
+        "models": "/app/models",
+        "cache": "/app/cache"
+      },
+      "environment_variables": [
+        "PYTHONPATH=/app",
+        "ENVIRONMENT=${ENVIRONMENT}",
+        "SECRET_KEY=${SECRET_KEY}"
+      ]
+    }
+  },
+  "validation": {
+    "required_env_vars": [
+      "ENVIRONMENT",
+      "SECRET_KEY"
+    ],
+    "optional_env_vars": [
+      "DATABASE_URL",
+      "REDIS_URL",
+      "CORS_ORIGINS",
+      "LOG_LEVEL"
+    ]
+  }
+} 

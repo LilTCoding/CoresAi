@@ -1,0 +1,449 @@
+{
+  "data_structure": {
+    "version": "1.0.0",
+    "description": "CoresAI data organization and database schema documentation",
+    "last_updated": "2024-12-19"
+  },
+  "directories": {
+    "data": {
+      "path": "./data",
+      "description": "Application data storage",
+      "subdirectories": {
+        "user_data": {
+          "path": "./data/user_data",
+          "description": "User-specific data and preferences",
+          "files": [
+            "user_preferences.json",
+            "conversation_history.jsonl",
+            "user_profiles.json"
+          ]
+        },
+        "cache": {
+          "path": "./data/cache",
+          "description": "Cached responses and temporary data",
+          "files": [
+            "web_search_cache.json",
+            "model_cache.json",
+            "response_cache.json"
+          ]
+        },
+        "knowledge_base": {
+          "path": "./data/knowledge_base",
+          "description": "Creative software knowledge and documentation",
+          "files": [
+            "photoshop_tools.json",
+            "blender_workspaces.json",
+            "vegas_effects.json",
+            "creative_techniques.json"
+          ]
+        },
+        "databases": {
+          "path": "./data/databases",
+          "description": "SQLite database files",
+          "files": [
+            "coresai.db",
+            "user_sessions.db",
+            "analytics.db"
+          ]
+        }
+      }
+    },
+    "logs": {
+      "path": "./logs",
+      "description": "Application logs and debugging information",
+      "subdirectories": {
+        "application": {
+          "path": "./logs/application",
+          "description": "Main application logs",
+          "files": [
+            "coresai.log",
+            "streaming.log",
+            "production.log"
+          ]
+        },
+        "errors": {
+          "path": "./logs/errors",
+          "description": "Error logs and stack traces",
+          "files": [
+            "errors.log",
+            "exceptions.log",
+            "critical.log"
+          ]
+        },
+        "access": {
+          "path": "./logs/access",
+          "description": "API access and request logs",
+          "files": [
+            "api_access.log",
+            "streaming_access.log"
+          ]
+        }
+      }
+    },
+    "models": {
+      "path": "./models",
+      "description": "AI models and weights",
+      "subdirectories": {
+        "pretrained": {
+          "path": "./models/pretrained",
+          "description": "Pre-trained model files",
+          "files": [
+            "face_detection_model.xml",
+            "language_model.bin"
+          ]
+        },
+        "fine_tuned": {
+          "path": "./models/fine_tuned",
+          "description": "Fine-tuned and custom models",
+          "files": [
+            "creative_software_model.bin",
+            "conversation_model.bin"
+          ]
+        },
+        "cache": {
+          "path": "./models/cache",
+          "description": "Cached model data and embeddings",
+          "files": [
+            "embeddings_cache.json",
+            "model_metadata.json"
+          ]
+        }
+      }
+    },
+    "experiments": {
+      "path": "./experiment_logs",
+      "description": "Experiment results and configurations",
+      "files": [
+        "model_experiments.json",
+        "performance_metrics.json",
+        "ablation_studies.json"
+      ]
+    }
+  },
+  "database_schemas": {
+    "users": {
+      "table_name": "users",
+      "description": "User accounts and authentication",
+      "columns": {
+        "id": {
+          "type": "INTEGER",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        "username": {
+          "type": "VARCHAR(50)",
+          "unique": true,
+          "nullable": false
+        },
+        "email": {
+          "type": "VARCHAR(255)",
+          "unique": true,
+          "nullable": false
+        },
+        "password_hash": {
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        "created_at": {
+          "type": "TIMESTAMP",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "last_login": {
+          "type": "TIMESTAMP",
+          "nullable": true
+        },
+        "preferences": {
+          "type": "JSON",
+          "nullable": true
+        }
+      },
+      "indexes": [
+        "username",
+        "email",
+        "created_at"
+      ]
+    },
+    "conversations": {
+      "table_name": "conversations",
+      "description": "Chat conversations and message history",
+      "columns": {
+        "id": {
+          "type": "INTEGER",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        "user_id": {
+          "type": "INTEGER",
+          "foreign_key": "users.id",
+          "nullable": false
+        },
+        "session_id": {
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        "message_role": {
+          "type": "ENUM",
+          "values": ["user", "assistant", "system"],
+          "nullable": false
+        },
+        "message_content": {
+          "type": "TEXT",
+          "nullable": false
+        },
+        "timestamp": {
+          "type": "TIMESTAMP",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "message_type": {
+          "type": "VARCHAR(50)",
+          "default": "text"
+        },
+        "metadata": {
+          "type": "JSON",
+          "nullable": true
+        }
+      },
+      "indexes": [
+        "user_id",
+        "session_id",
+        "timestamp",
+        "message_type"
+      ]
+    },
+    "api_requests": {
+      "table_name": "api_requests",
+      "description": "API request logging and analytics",
+      "columns": {
+        "id": {
+          "type": "INTEGER",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        "endpoint": {
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        "method": {
+          "type": "VARCHAR(10)",
+          "nullable": false
+        },
+        "user_id": {
+          "type": "INTEGER",
+          "foreign_key": "users.id",
+          "nullable": true
+        },
+        "ip_address": {
+          "type": "VARCHAR(45)",
+          "nullable": false
+        },
+        "user_agent": {
+          "type": "TEXT",
+          "nullable": true
+        },
+        "request_body": {
+          "type": "JSON",
+          "nullable": true
+        },
+        "response_status": {
+          "type": "INTEGER",
+          "nullable": false
+        },
+        "response_time_ms": {
+          "type": "INTEGER",
+          "nullable": false
+        },
+        "timestamp": {
+          "type": "TIMESTAMP",
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": [
+        "endpoint",
+        "user_id",
+        "timestamp",
+        "response_status"
+      ]
+    },
+    "creative_software_data": {
+      "table_name": "creative_software_data",
+      "description": "Creative software tools and knowledge base",
+      "columns": {
+        "id": {
+          "type": "INTEGER",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        "software": {
+          "type": "VARCHAR(50)",
+          "nullable": false
+        },
+        "category": {
+          "type": "VARCHAR(50)",
+          "nullable": false
+        },
+        "name": {
+          "type": "VARCHAR(100)",
+          "nullable": false
+        },
+        "shortcut": {
+          "type": "VARCHAR(20)",
+          "nullable": true
+        },
+        "function_description": {
+          "type": "TEXT",
+          "nullable": false
+        },
+        "technical_details": {
+          "type": "TEXT",
+          "nullable": false
+        },
+        "usage_examples": {
+          "type": "JSON",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "TIMESTAMP",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "type": "TIMESTAMP",
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": [
+        "software",
+        "category",
+        "name"
+      ]
+    },
+    "face_tracking_sessions": {
+      "table_name": "face_tracking_sessions",
+      "description": "Face tracking and camera session data",
+      "columns": {
+        "id": {
+          "type": "INTEGER",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        "user_id": {
+          "type": "INTEGER",
+          "foreign_key": "users.id",
+          "nullable": true
+        },
+        "session_start": {
+          "type": "TIMESTAMP",
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "session_end": {
+          "type": "TIMESTAMP",
+          "nullable": true
+        },
+        "camera_device": {
+          "type": "VARCHAR(100)",
+          "nullable": true
+        },
+        "detection_count": {
+          "type": "INTEGER",
+          "default": 0
+        },
+        "tracking_data": {
+          "type": "JSON",
+          "nullable": true
+        }
+      },
+      "indexes": [
+        "user_id",
+        "session_start"
+      ]
+    }
+  },
+  "file_formats": {
+    "configuration": {
+      "extension": ".json",
+      "description": "JSON configuration files",
+      "schema_validation": true,
+      "examples": [
+        "config.json",
+        "features.json",
+        "models.json"
+      ]
+    },
+    "logs": {
+      "extension": ".log",
+      "description": "Plain text log files with timestamps",
+      "rotation": true,
+      "max_size": "10MB",
+      "examples": [
+        "coresai.log",
+        "errors.log"
+      ]
+    },
+    "data_storage": {
+      "extension": ".jsonl",
+      "description": "JSON Lines format for streaming data",
+      "compression": "gzip",
+      "examples": [
+        "conversation_history.jsonl",
+        "api_requests.jsonl"
+      ]
+    },
+    "cache": {
+      "extension": ".cache",
+      "description": "Binary cached data",
+      "compression": true,
+      "ttl": "24h",
+      "examples": [
+        "model_embeddings.cache",
+        "response_cache.cache"
+      ]
+    }
+  },
+  "data_migration": {
+    "versioning": {
+      "current_version": "1.0.0",
+      "migration_scripts": "./data/migrations/",
+      "backup_before_migration": true
+    },
+    "migration_history": [
+      {
+        "version": "1.0.0",
+        "date": "2024-12-19",
+        "description": "Initial schema creation",
+        "script": "001_initial_schema.sql"
+      }
+    ]
+  },
+  "backup_strategy": {
+    "frequency": "daily",
+    "retention_period": "30 days",
+    "backup_location": "./backups/",
+    "compression": true,
+    "encryption": false,
+    "automated": true,
+    "included_paths": [
+      "./data/",
+      "./logs/",
+      "./models/saved/"
+    ],
+    "excluded_paths": [
+      "./data/cache/",
+      "./logs/debug/",
+      "./models/pretrained/"
+    ]
+  },
+  "data_privacy": {
+    "user_data_encryption": false,
+    "data_anonymization": true,
+    "retention_policy": {
+      "conversation_history": "1 year",
+      "api_logs": "6 months",
+      "error_logs": "3 months",
+      "user_sessions": "30 days"
+    },
+    "gdpr_compliance": {
+      "data_export": true,
+      "data_deletion": true,
+      "consent_tracking": false
+    }
+  }
+} 

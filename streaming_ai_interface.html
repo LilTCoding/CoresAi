@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoresAI - Streaming Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+
+        .control-group select, .control-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: white;
+            border: 1px solid #e9ecef;
+            margin-right: auto;
+        }
+
+        .structured-response {
+            background: #f8f9fa;
+            border: 2px solid #007bff;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            max-width: 90%;
+        }
+
+        .streaming-indicator {
+            display: none;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .search-result {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-result h4 {
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .search-result p {
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .search-result .url {
+            color: #28a745;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .notification-item {
+            background: white;
+            border-left: 4px solid #007bff;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .notification-item.high { border-left-color: #dc3545; }
+        .notification-item.medium { border-left-color: #ffc107; }
+        .notification-item.low { border-left-color: #28a745; }
+
+        .task-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-item .task-content h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .task-item .task-content p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .task-item .task-meta {
+            text-align: right;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+
+                .analysis-point {            background: #f8f9fa;            border-left: 3px solid #007bff;            padding: 12px 15px;            margin: 10px 0;            border-radius: 0 5px 5px 0;        }        /* Creative Software Styles */        .software-tool {            background: white;            border: 1px solid #e9ecef;            border-radius: 8px;            padding: 15px;            margin: 10px 0;            box-shadow: 0 2px 4px rgba(0,0,0,0.1);            border-left: 4px solid #6f42c1;        }        .software-tool h4 {            color: #6f42c1;            margin-bottom: 8px;            display: flex;            align-items: center;            gap: 10px;        }        .software-tool .shortcut {            background: #6f42c1;            color: white;            padding: 2px 8px;            border-radius: 4px;            font-size: 12px;            font-weight: bold;        }        .software-workspace {            background: #f8f9fa;            border: 1px solid #dee2e6;            border-radius: 8px;            padding: 15px;            margin: 10px 0;            border-left: 4px solid #28a745;        }        .software-workspace h4 {            color: #28a745;            margin-bottom: 8px;        }        .technique-steps {            background: #fff3cd;            border: 1px solid #ffeaa7;            border-radius: 8px;            padding: 15px;            margin: 10px 0;        }        .technique-steps h4 {            color: #856404;            margin-bottom: 10px;        }        .technique-steps ol {            margin-left: 20px;        }        .technique-steps li {            margin-bottom: 5px;        }        .software-focus {            background: linear-gradient(135deg, #6f42c1, #8e44ad);            color: white;            padding: 15px;            border-radius: 8px;            margin-bottom: 15px;            text-align: center;        }        .common-concepts {            background: #e7f3ff;            border: 1px solid #b3d9ff;            border-radius: 8px;            padding: 15px;            margin: 15px 0;        }        .common-concepts h4 {            color: #0066cc;            margin-bottom: 10px;
+        }
+
+        .analysis-point h5 {
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .confidence-bar {
+            background: #e9ecef;
+            height: 6px;
+            border-radius: 3px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .input-field:focus {
+            border-color: #007bff;
+        }
+
+        .send-button, .stop-button {
+            padding: 12px 24px;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stop-button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            display: none;
+        }
+
+        .send-button:hover, .stop-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-button:disabled, .stop-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .example-queries {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .example-queries h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .example-button {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 16px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .example-button:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .chunk-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: #f1f3f4;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .streaming {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 CoresAI Streaming</h1>
+            <p>Advanced AI with Structured Object Streaming</p>
+        </div>
+        
+        <div class="status" id="status">
+            ✅ Streaming Backend v4.0.0 - Ready for Structured Responses
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Output Mode:</label>
+                <select id="outputMode">
+                    <option value="object">Object Mode</option>
+                    <option value="array">Array Mode</option>
+                    <option value="no-schema">No Schema Mode</option>
+                </select>
+                
+                <label>Schema Type:</label>
+                                                <select id="schemaType">                    <option value="auto">Auto Detect</option>                    <option value="general">General</option>                    <option value="search">Search Results</option>                    <option value="notifications">Notifications</option>                    <option value="tasks">Task Items</option>                    <option value="analysis">Analysis</option>                    <option value="creative_software">Creative Software</option>                </select>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message ai-message">
+                <strong>🤖 CoresAI Streaming:</strong> Hello! I'm your advanced AI assistant with structured streaming capabilities. I can generate search results, notifications, tasks, analysis, and more in real-time. Try asking for different types of responses!
+            </div>
+        </div>
+
+        <div class="streaming-indicator" id="streamingIndicator">
+            🔄 Streaming structured response... <span id="chunkCount">0</span> chunks received
+            <button class="stop-button" id="stopButton" onclick="stopStreaming()">Stop</button>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="messageInput" class="input-field" placeholder="Try: 'search for AI developments' or 'create tasks for project planning'" onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" class="send-button" id="sendButton">Send</button>
+        </div>
+
+        <div class="example-queries">
+            <h3>💡 Try these structured examples:</h3>
+                        <button class="example-button" onclick="setMessage('search for latest AI developments')">🔍 Search AI News</button>            <button class="example-button" onclick="setMessage('create notifications for team meeting')">📬 Generate Notifications</button>            <button class="example-button" onclick="setMessage('plan tasks for website redesign')">📋 Create Tasks</button>            <button class="example-button" onclick="setMessage('analyze market trends in technology')">📊 Market Analysis</button>            <button class="example-button" onclick="setMessage('How do I use the brush tool in Photoshop?')">🎨 Creative Software</button>            <button class="example-button" onclick="setMessage('What are your capabilities?')">🤖 General Response</button>
+        </div>
+    </div>
+
+    <script>
+        let conversation = [];
+        let currentEventSource = null;
+        let isStreaming = false;
+        let currentStreamingContainer = null;
+        let chunkCount = 0;
+
+        function setMessage(message) {
+            document.getElementById('messageInput').value = message;
+            document.getElementById('messageInput').focus();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !isStreaming) {
+                sendMessage();
+            }
+        }
+
+        function stopStreaming() {
+            if (currentEventSource) {
+                currentEventSource.close();
+                currentEventSource = null;
+            }
+            
+            isStreaming = false;
+            document.getElementById('streamingIndicator').style.display = 'none';
+            document.getElementById('sendButton').disabled = false;
+            document.getElementById('messageInput').disabled = false;
+            
+            if (currentStreamingContainer) {
+                currentStreamingContainer.classList.remove('streaming');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || isStreaming) return;
+
+            const outputMode = document.getElementById('outputMode').value;
+            const schemaType = document.getElementById('schemaType').value;
+
+            // Disable input and show streaming indicator
+            input.disabled = true;
+            document.getElementById('sendButton').disabled = true;
+            isStreaming = true;
+            chunkCount = 0;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            conversation.push({ role: 'user', content: message });
+
+            // Clear input
+            input.value = '';
+
+            // Create streaming container
+            currentStreamingContainer = createStreamingContainer();
+            
+            // Show streaming indicator
+            document.getElementById('streamingIndicator').style.display = 'block';
+            document.getElementById('chunkCount').textContent = '0';
+
+            try {
+                // Determine schema type
+                let finalSchemaType = schemaType;
+                if (schemaType === 'auto') {
+                                         const detectionResponse = await fetch('http://localhost:8081/api/v1/detect-schema', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: message })
+                    });
+                    const detection = await detectionResponse.json();
+                    finalSchemaType = detection.detected_schema;
+                }
+
+                // Start streaming
+                                 currentEventSource = new EventSource(`http://localhost:8081/api/v1/stream-object`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: conversation,
+                        output_mode: outputMode,
+                        schema_type: finalSchemaType
+                    })
+                });
+
+                // For POST with EventSource, we need to use fetch with streaming
+                                 const response = await fetch('http://localhost:8081/api/v1/stream-object', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream'
+                    },
+                    body: JSON.stringify({
+                        messages: conversation,
+                        output_mode: outputMode,
+                        schema_type: finalSchemaType
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                handleStreamingChunk(data, finalSchemaType);
+                                chunkCount++;
+                                document.getElementById('chunkCount').textContent = chunkCount;
+                                
+                                if (data.is_final) {
+                                    stopStreaming();
+                                    break;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing chunk:', e);
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                currentStreamingContainer.innerHTML = `
+                    <div style="color: #dc3545; padding: 20px; text-align: center;">
+                                                 <strong>Error:</strong> Could not connect to streaming backend. Please ensure the server is running on port 8081.
+                    </div>
+                `;
+                stopStreaming();
+            }
+        }
+
+        function createStreamingContainer() {
+            const chatContainer = document.getElementById('chatContainer');
+            const container = document.createElement('div');
+            container.className = 'structured-response streaming';
+            container.innerHTML = '<div style="color: #666; font-style: italic;">Preparing structured response...</div>';
+            chatContainer.appendChild(container);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return container;
+        }
+
+        function handleStreamingChunk(chunk, schemaType) {
+            if (!currentStreamingContainer) return;
+
+            const chunkInfo = `<div class="chunk-info">Chunk ${chunk.chunk_index} | ${chunk.chunk_type}</div>`;
+
+                        if (schemaType === 'search') {                handleSearchChunk(chunk);            } else if (schemaType === 'notifications') {                handleNotificationsChunk(chunk);            } else if (schemaType === 'tasks') {                handleTasksChunk(chunk);            } else if (schemaType === 'analysis') {                handleAnalysisChunk(chunk);            } else if (schemaType === 'creative_software') {                handleCreativeSoftwareChunk(chunk);            } else {                handleGeneralChunk(chunk);            }
+
+            currentStreamingContainer.innerHTML += chunkInfo;
+            document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+        }
+
+        function handleSearchChunk(chunk) {
+            const data = chunk.data;
+            
+            if (chunk.chunk_type === 'partial' && data.query) {
+                let html = `<h3>🔍 Search Results for: "${data.query}"</h3>`;
+                
+                if (data.results) {
+                    data.results.forEach(result => {
+                        html += `
+                            <div class="search-result">
+                                <h4>${result.title}</h4>
+                                <p>${result.snippet}</p>
+                                <a href="${result.url}" class="url" target="_blank">${result.url}</a>
+                                <div style="margin-top: 8px; font-size: 12px; color: #888;">
+                                    Relevance: ${(result.relevance_score * 100).toFixed(1)}%
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                currentStreamingContainer.innerHTML = html;
+            } else if (chunk.chunk_type === 'complete' && data.summary) {
+                let html = currentStreamingContainer.innerHTML;
+                html += `
+                    <div class="analysis-section">
+                        <h4>📋 Summary</h4>
+                        <p>${data.summary}</p>
+                    </div>
+                `;
+                currentStreamingContainer.innerHTML = html;
+            }
+        }
+
+        function handleNotificationsChunk(chunk) {
+            const data = chunk.data;
+            
+            if (chunk.chunk_type === 'partial' && !Array.isArray(data)) {
+                // Single notification in array mode
+                const html = `
+                    <div class="notification-item ${data.priority}">
+                        <strong>${data.name}</strong>
+                        <p>${data.message}</p>
+                        <small>Priority: ${data.priority} | ${data.timestamp}</small>
+                    </div>
+                `;
+                currentStreamingContainer.innerHTML += html;
+            } else if (data.notifications) {
+                // Object mode
+                let html = '<h3>📬 Notifications</h3>';
+                data.notifications.forEach(notification => {
+                    html += `
+                        <div class="notification-item ${notification.priority}">
+                            <strong>${notification.name}</strong>
+                            <p>${notification.message}</p>
+                            <small>Priority: ${notification.priority} | ${notification.timestamp}</small>
+                        </div>
+                    `;
+                });
+                currentStreamingContainer.innerHTML = html;
+            }
+        }
+
+        function handleTasksChunk(chunk) {
+            const data = chunk.data;
+            
+            if (chunk.chunk_type === 'partial' && !Array.isArray(data) && data.title) {
+                // Single task in array mode
+                const html = `
+                    <div class="task-item">
+                        <div class="task-content">
+                            <h4>${data.title}</h4>
+                            <p>${data.description}</p>
+                        </div>
+                        <div class="task-meta">
+                            <div>Priority: ${data.priority}</div>
+                            <div>Time: ${data.estimated_time}</div>
+                            <div>Category: ${data.category}</div>
+                        </div>
+                    </div>
+                `;
+                currentStreamingContainer.innerHTML += html;
+            } else if (data.tasks) {
+                // Object mode
+                let html = '<h3>📋 Task Items</h3>';
+                data.tasks.forEach(task => {
+                    html += `
+                        <div class="task-item">
+                            <div class="task-content">
+                                <h4>${task.title}</h4>
+                                <p>${task.description}</p>
+                            </div>
+                            <div class="task-meta">
+                                <div>Priority: ${task.priority}</div>
+                                <div>Time: ${task.estimated_time}</div>
+                                <div>Category: ${task.category}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                currentStreamingContainer.innerHTML = html;
+            }
+        }
+
+        function handleAnalysisChunk(chunk) {
+            const data = chunk.data;
+            
+            let html = '';
+            
+            if (data.topic) {
+                html += `<h3>📊 Analysis: ${data.topic}</h3>`;
+            }
+            
+            if (data.summary) {
+                html += `
+                    <div class="analysis-section">
+                        <h4>Executive Summary</h4>
+                        <p>${data.summary}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.key_points) {
+                html += '<div class="analysis-section"><h4>Key Findings</h4>';
+                data.key_points.forEach(point => {
+                    html += `
+                        <div class="analysis-point">
+                            <h5>${point.category}</h5>
+                            <p><strong>Finding:</strong> ${point.finding}</p>
+                            <p><strong>Implications:</strong> ${point.implications}</p>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${point.confidence * 100}%"></div>
+                            </div>
+                            <small>Confidence: ${(point.confidence * 100).toFixed(1)}%</small>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            
+            if (data.recommendations) {
+                html += '<div class="analysis-section"><h4>Recommendations</h4><ul>';
+                data.recommendations.forEach(rec => {
+                    html += `<li>${rec}</li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            if (data.confidence_level) {
+                html += `
+                    <div class="analysis-section">
+                        <h4>Overall Confidence</h4>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${data.confidence_level * 100}%"></div>
+                        </div>
+                        <small>${(data.confidence_level * 100).toFixed(1)}% confidence</small>
+                    </div>
+                `;
+            }
+            
+            currentStreamingContainer.innerHTML = html;
+        }
+
+                function handleCreativeSoftwareChunk(chunk) {            const data = chunk.data;                        let html = '';                        if (data.software_focus) {                html += `                    <div class="software-focus">                        <h3>🎨 ${data.software_focus} Knowledge</h3>                        <p>Query: "${data.query}"</p>                    </div>                `;            }                        // Handle tools            if (data.tools && data.tools.length > 0) {                html += '<div class="analysis-section"><h4>🛠️ Tools & Functions</h4>';                data.tools.forEach(tool => {                    html += `                        <div class="software-tool">                            <h4>                                ${tool.name}                                ${tool.shortcut ? `<span class="shortcut">${tool.shortcut}</span>` : ''}                            </h4>                            <p><strong>Function:</strong> ${tool.function}</p>                            <p><strong>How it works:</strong> ${tool.how_it_works}</p>                            <small>Category: ${tool.category}</small>                        </div>                    `;                });                html += '</div>';            }                        // Handle workspaces            if (data.workspaces && data.workspaces.length > 0) {                html += '<div class="analysis-section"><h4>🖥️ Workspaces & Interfaces</h4>';                data.workspaces.forEach(workspace => {                    html += `                        <div class="software-workspace">                            <h4>${workspace.name}</h4>                            <p><strong>Purpose:</strong> ${workspace.purpose}</p>                            <p><strong>How it works:</strong> ${workspace.how_it_works}</p>                            <small>Software: ${workspace.software}</small>                        </div>                    `;                });                html += '</div>';            }                        // Handle techniques            if (data.techniques && data.techniques.length > 0) {                html += '<div class="analysis-section"><h4>⚡ Techniques & Workflows</h4>';                data.techniques.forEach(technique => {                    html += `                        <div class="technique-steps">                            <h4>${technique.technique}</h4>                            <p><strong>Description:</strong> ${technique.description}</p>                            <p><strong>Software:</strong> ${technique.software}</p>                            <h5>Steps:</h5>                            <ol>                                ${technique.steps.map(step => `<li>${step}</li>`).join('')}                            </ol>                            <p><strong>Technical Details:</strong> ${technique.technical_details}</p>                        </div>                    `;                });                html += '</div>';            }                        // Handle common concepts            if (data.common_concepts && data.common_concepts.length > 0) {                html += `                    <div class="common_concepts">                        <h4>🔗 Common Concepts Across Software</h4>                        <ul>                            ${data.common_concepts.map(concept => `<li>${concept}</li>`).join('')}                        </ul>                    </div>                `;            }                        // Handle summary            if (data.summary) {                html += `                    <div class="analysis-section">                        <h4>📋 Summary</h4>                        <p>${data.summary}</p>                    </div>                `;            }                        currentStreamingContainer.innerHTML = html;        }        function handleGeneralChunk(chunk) {            const data = chunk.data;                        let html = '<div class="analysis-section">';                        if (data.message) {                html += `<p><strong>Response:</strong> ${data.message}</p>`;            }                        if (data.response) {                html += `<p>${data.response}</p>`;            }                        if (data.analysis) {                html += `<p><strong>Analysis:</strong> ${data.analysis}</p>`;            }                        if (data.capabilities) {                html += '<p><strong>Capabilities:</strong> ' + data.capabilities.join(', ') + '</p>';            }                        if (data.suggestions) {                html += '<h4>Suggestions:</h4><ul>';                data.suggestions.forEach(suggestion => {                    html += `<li>${suggestion}</li>`;                });                html += '</ul>';            }                        if (data.next_steps) {                html += `<p><strong>Next Steps:</strong> ${data.next_steps}</p>`;            }                        if (data.confidence) {                html += `<p><strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%</p>`;            }                        html += '</div>';                        currentStreamingContainer.innerHTML = html;        }
+
+        function addMessage(content, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `<strong>👤 You:</strong> ${content}`;
+            } else {
+                messageDiv.innerHTML = `<strong>🤖 CoresAI:</strong> ${content}`;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Test backend connection on load
+        window.onload = async function() {
+            try {
+                                 const response = await fetch('http://localhost:8081/health');
+                const data = await response.json();
+                document.getElementById('status').innerHTML = `✅ ${data.message} - v${data.version}`;
+            } catch (error) {
+                document.getElementById('status').innerHTML = '❌ Backend not connected - Please start the streaming backend';
+                document.getElementById('status').style.background = '#dc3545';
+            }
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,234 @@
+{
+  "api_version": "v1",
+  "base_urls": {
+    "production": "http://localhost:8080",
+    "streaming": "http://localhost:8081"
+  },
+  "endpoints": {
+    "health": {
+      "path": "/health",
+      "method": "GET",
+      "description": "Health check endpoint",
+      "available_on": ["production", "streaming"],
+      "response": {
+        "status": "string",
+        "message": "string", 
+        "version": "string",
+        "features": "array"
+      }
+    },
+    "root": {
+      "path": "/",
+      "method": "GET", 
+      "description": "Root endpoint with service info",
+      "available_on": ["production", "streaming"],
+      "response": {
+        "message": "string",
+        "version": "string",
+        "status": "string"
+      }
+    },
+    "chat": {
+      "path": "/api/v1/chat",
+      "method": "POST",
+      "description": "Traditional chat endpoint",
+      "available_on": ["production", "streaming"],
+      "request": {
+        "messages": [
+          {
+            "role": "string",
+            "content": "string"
+          }
+        ]
+      },
+      "response": {
+        "messages": "array"
+      }
+    },
+    "stream_object": {
+      "path": "/api/v1/stream-object", 
+      "method": "POST",
+      "description": "Structured streaming endpoint",
+      "available_on": ["streaming"],
+      "request": {
+        "messages": "array",
+        "output_mode": "object|array|no-schema",
+        "schema_type": "general|search|notifications|tasks|analysis|creative_software",
+        "context": "string (optional)"
+      },
+      "response": "Server-Sent Events stream"
+    },
+    "detect_schema": {
+      "path": "/api/v1/detect-schema",
+      "method": "POST", 
+      "description": "Auto-detect appropriate schema type",
+      "available_on": ["streaming"],
+      "request": {
+        "message": "string"
+      },
+      "response": {
+        "message": "string",
+        "detected_schema": "string",
+        "available_schemas": "array"
+      }
+    },
+    "web_search": {
+      "path": "/api/v1/search",
+      "method": "POST",
+      "description": "Web search endpoint",
+      "available_on": ["production", "streaming"],
+      "request": {
+        "query": "string"
+      },
+      "response": {
+        "query": "string",
+        "results": "array",
+        "summary": "string"
+      }
+    },
+    "server_status": {
+      "path": "/api/v1/server-status",
+      "method": "POST",
+      "description": "Server status endpoint",
+      "available_on": ["production", "streaming"],
+      "request": {},
+      "response": {
+        "status": "string",
+        "message": "string",
+        "features": "array"
+      }
+    },
+    "file_operations": {
+      "list_files": {
+        "path": "/api/v1/list-files",
+        "method": "POST",
+        "description": "List files for game servers",
+        "available_on": ["production"],
+        "request": {
+          "game": "string",
+          "subdir": "string (optional)"
+        },
+        "response": {
+          "items": "array"
+        }
+      },
+      "read_file": {
+        "path": "/api/v1/read-file", 
+        "method": "POST",
+        "description": "Read file content",
+        "available_on": ["production"],
+        "request": {
+          "game": "string",
+          "filepath": "string"
+        },
+        "response": {
+          "content": "string"
+        }
+      },
+      "write_file": {
+        "path": "/api/v1/write-file",
+        "method": "POST", 
+        "description": "Write file content",
+        "available_on": ["production"],
+        "request": {
+          "game": "string",
+          "filepath": "string",
+          "content": "string"
+        },
+        "response": {
+          "message": "string"
+        }
+      },
+      "delete_file": {
+        "path": "/api/v1/delete-file",
+        "method": "POST",
+        "description": "Delete file",
+        "available_on": ["production"],
+        "request": {
+          "game": "string", 
+          "filepath": "string"
+        },
+        "response": {
+          "message": "string"
+        }
+      }
+    },
+    "game_server_management": {
+      "start_server": {
+        "path": "/api/v1/start-server",
+        "method": "POST",
+        "description": "Start game server",
+        "available_on": ["production"],
+        "request": {
+          "game": "string"
+        },
+        "response": {
+          "message": "string",
+          "status": "string"
+        }
+      },
+      "stop_server": {
+        "path": "/api/v1/stop-server",
+        "method": "POST",
+        "description": "Stop game server", 
+        "available_on": ["production"],
+        "request": {
+          "game": "string"
+        },
+        "response": {
+          "message": "string",
+          "status": "string"
+        }
+      },
+      "restart_server": {
+        "path": "/api/v1/restart-server",
+        "method": "POST",
+        "description": "Restart game server",
+        "available_on": ["production"],
+        "request": {
+          "game": "string"
+        },
+        "response": {
+          "message": "string",
+          "status": "string"
+        }
+      }
+    }
+  },
+  "schemas": {
+    "search": {
+      "description": "Web search results with structured data",
+      "fields": ["query", "results", "summary"]
+    },
+    "notifications": {
+      "description": "Notification items with priority and timestamps",
+      "fields": ["name", "message", "timestamp", "priority"]
+    },
+    "tasks": {
+      "description": "Task items with categories and time estimates",
+      "fields": ["title", "description", "priority", "estimated_time", "category"]
+    },
+    "analysis": {
+      "description": "Structured analysis with findings and recommendations", 
+      "fields": ["topic", "summary", "key_points", "recommendations", "confidence_level"]
+    },
+    "creative_software": {
+      "description": "Creative software knowledge (Photoshop, Blender, VEGAS)",
+      "fields": ["query", "software_focus", "tools", "workspaces", "techniques", "common_concepts", "summary"]
+    }
+  },
+  "output_modes": {
+    "object": {
+      "description": "Streams complete object progressively",
+      "use_case": "Complete structured responses that build over time"
+    },
+    "array": {
+      "description": "Streams array elements individually",
+      "use_case": "Items that should appear as soon as available"
+    },
+    "no-schema": {
+      "description": "Free-form JSON without predefined structure",
+      "use_case": "Flexible, dynamic response structures"
+    }
+  }
+} 

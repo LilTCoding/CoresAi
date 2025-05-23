@@ -1,0 +1,141 @@
+{
+  "project": {
+    "name": "CoresAI",
+    "version": "4.1.0",
+    "description": "Advanced AI System with Multi-Backend Architecture",
+    "author": "Torey",
+    "created": "2024",
+    "license": "MIT"
+  },
+  "backends": {
+    "production": {
+      "enabled": true,
+      "host": "0.0.0.0",
+      "port": 8080,
+      "file": "production_ai_backend.py",
+      "features": [
+        "web_search",
+        "enhanced_reasoning", 
+        "real_time_data",
+        "advanced_ai"
+      ],
+      "cors_origins": ["*"],
+      "timeout": 30
+    },
+    "streaming": {
+      "enabled": true,
+      "host": "0.0.0.0", 
+      "port": 8081,
+      "file": "streaming_ai_backend.py",
+      "features": [
+        "structured_streaming",
+        "object_mode",
+        "array_mode", 
+        "no_schema_mode",
+        "creative_software_knowledge"
+      ],
+      "cors_origins": ["*"],
+      "timeout": 60
+    },
+    "simple": {
+      "enabled": false,
+      "host": "0.0.0.0",
+      "port": 8080,
+      "file": "simple_backend.py",
+      "features": ["basic_chat"],
+      "cors_origins": ["*"],
+      "timeout": 15
+    }
+  },
+  "gui": {
+    "enabled": true,
+    "file": "gui_app.py",
+    "features": [
+      "face_detection",
+      "ai_head_tracking",
+      "server_management",
+      "game_server_tabs",
+      "file_editing",
+      "ai_chat"
+    ],
+    "face_detection": {
+      "enabled": true,
+      "camera_index": 0,
+      "head_image": "ai_facedetect_head.png",
+      "sensitivity": 0.1,
+      "cascade_file": "haarcascade_frontalface_default.xml"
+    },
+    "splash": {
+      "enabled": true,
+      "image": "dragon_logo.png",
+      "duration": 2500
+    },
+    "header": {
+      "image": "header_image.png"
+    }
+  },
+  "ai": {
+    "models": {
+      "voice_processor": {
+        "enabled": false,
+        "backend": "bark",
+        "gpu": false,
+        "preload": false
+      },
+      "face_detection": {
+        "enabled": true,
+        "backend": "opencv",
+        "cascade": "haarcascade_frontalface_default.xml"
+      }
+    },
+    "capabilities": [
+      "natural_language_processing",
+      "web_search", 
+      "structured_streaming",
+      "face_detection",
+      "creative_software_knowledge",
+      "real_time_responses"
+    ]
+  },
+  "creative_software": {
+    "enabled": true,
+    "supported": [
+      "adobe_photoshop",
+      "blender",
+      "vegas_pro"
+    ],
+    "knowledge_base": {
+      "tools": true,
+      "workspaces": true,
+      "techniques": true,
+      "common_concepts": true
+    }
+  },
+  "database": {
+    "type": "file_based",
+    "paths": {
+      "data": "./data",
+      "models": "./models", 
+      "logs": "./logs",
+      "experiments": "./experiment_logs"
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "./logs/coresai.log",
+    "console": true,
+    "rotation": "daily",
+    "max_files": 7
+  },
+  "security": {
+    "cors_enabled": true,
+    "rate_limiting": false,
+    "api_keys": false,
+    "ssl": false
+  },
+  "development": {
+    "debug": false,
+    "hot_reload": true,
+    "test_mode": false
+  }
+} 
