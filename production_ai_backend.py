@@ -4,15 +4,24 @@ import requests
 import json
 from datetime import datetime
 import asyncio
+import sys
+import logging
+from typing import List, Dict, Any, Optional
+from fastapi import FastAPI, HTTPException, Depends, Security, BackgroundTasks, Body
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import uvicorn
+
+# Constants
+SUPPORTED_GAMES = ["fivem_qb", "minecraft", "arma_reforger", "rust"]
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Optional
-import uvicorn
-from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI(title="CoresAI Production Backend", version="3.0.0")
+app = FastAPI(
+    title="CoresAI Production Backend",
+    description="Advanced AI System with Multi-Backend Architecture",
+    version="3.0.0"
+)
 
 # Add CORS middleware
 app.add_middleware(
@@ -356,15 +365,20 @@ async def web_search_endpoint(request: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error performing search: {str(e)}")
 
+@app.get("/api/v1/server-status")
 @app.post("/api/v1/server-status")
-async def server_status(request: dict):
-    return {
-        "status": "running", 
-        "message": "Production server operational",
-        "features": ["web_search", "enhanced_ai", "real_time_responses", "advanced_reasoning"],
-        "version": "3.0.0",
-        "performance": "optimized"
-    }
+async def get_server_status(game: str = None):
+    """
+    Get server status for a specific game or all games
+    """
+    try:
+        if game:
+            if game not in SUPPORTED_GAMES:
+                raise HTTPException(status_code=400, detail=f"Unsupported game: {game}")
+            return {"status": "running", "game": game}
+        return {"status": "running", "games": SUPPORTED_GAMES}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Server management endpoints (compatibility)
 @app.post("/api/v1/list-files")
@@ -390,9 +404,7 @@ async def stop_server(request: dict):
 if __name__ == "__main__":
     try:
         # Set UTF-8 encoding for Windows compatibility
-        import sys
         if sys.platform == "win32":
-            import os
             os.system("chcp 65001 > nul")
         
         print("=== Starting CoresAI Production Backend ===")

@@ -26,6 +26,14 @@ const streamingApi = axios.create({
   },
 });
 
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
 // Types based on your schemas
 export interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -179,13 +187,14 @@ export const getCreativeSoftwareKnowledge = async (query: string): Promise<any> 
 };
 
 // Server status
-export const getServerStatus = async (backend: 'production' | 'streaming'): Promise<any> => {
+export const getServerStatus = async (game?: string) => {
   try {
-    const api = backend === 'production' ? productionApi : streamingApi;
-    const response = await api.post('/api/v1/server-status', {});
+    const response = await api.get('/api/v1/server-status', {
+      params: { game }
+    });
     return response.data;
   } catch (error) {
-    console.error(`Failed to get ${backend} server status:`, error);
+    console.error('Failed to get server status:', error);
     throw error;
   }
 };
