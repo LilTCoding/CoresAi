@@ -1,0 +1,15 @@
+{
+    "useOverlay": false,
+    "discord":"https://discord.gg/GWZsjkJ",
+    "servers":[
+        {
+            "svname": "Server name here",
+            "ip":"xxxxxx"
+        },
+        {
+            "svname": "Server name here",
+            "ip":"xxxxxx"
+        }
+    ]
+
+}
