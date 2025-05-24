@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['gui_app.py'],
+    ['C:\\Users\\torey\\OneDrive\\Documents\\GitHub\\CoresAi\\gui_app.py'],
     pathex=[],
     binaries=[],
-    datas=[('*.json', '.'), ('*.png', '.'), ('*.ico', '.')],
-    hiddenimports=['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'wmi', 'win32com.client', 'pythoncom', 'psutil', 'ccxt', 'web3', 'eth_account', 'cryptography', 'redis', 'fastapi', 'uvicorn', 'websockets', 'schedule'],
+    datas=[('src', 'src'), ('frontend/build', 'frontend/build'), ('*.json', '.'), ('*.png', '.'), ('*.ico', '.')],
+    hiddenimports=['wmi', 'win32com.client', 'pythoncom', 'discord', 'pandas', 'numpy', 'PIL', 'requests', 'asyncio', 'aiohttp', 'PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'psutil', 'ccxt', 'web3', 'eth_account', 'cryptography', 'redis', 'fastapi', 'uvicorn', 'websockets', 'schedule', 'hmac', 'hashlib', 'base64', 'json', 'time', 'datetime', 'threading', 'queue', 'logging', 'os', 'sys'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -35,4 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['C:\\Users\\torey\\OneDrive\\Documents\\GitHub\\CoresAi\\coresai.ico'],
 )

@@ -1678,6 +1678,438 @@ class PortfolioTab(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to refresh insights: {str(e)}")
 
+class FiveMAntiCheatTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.current_anticheat = None
+        self.blacklisted_props = []
+        self.blacklisted_weapons = []
+        self.blacklisted_vehicles = []
+        self.blacklisted_peds = []
+        self.blacklisted_words = []
+        self.blacklisted_explosions = []
+        self._init_ui()
+
+    def _init_ui(self):
+        layout = QVBoxLayout(self)
+        
+        # Create main splitter
+        splitter = QSplitter(Qt.Horizontal)
+        
+        # Left side - Anticheat selection and basic config
+        left_widget = QWidget()
+        left_layout = QVBoxLayout(left_widget)
+        
+        # Anticheat Selection
+        selection_group = QGroupBox("Anticheat Selection")
+        selection_layout = QVBoxLayout()
+        
+        self.anticheat_combo = QComboBox()
+        self.anticheat_combo.addItems(["Badger Anticheat", "WaveShield", "Dub Anticheat"])
+        self.anticheat_combo.currentTextChanged.connect(self.load_anticheat_config)
+        selection_layout.addWidget(self.anticheat_combo)
+        
+        selection_group.setLayout(selection_layout)
+        left_layout.addWidget(selection_group)
+        
+        # Basic Configuration
+        config_group = QGroupBox("Basic Configuration")
+        config_layout = QVBoxLayout()
+        
+        # Components toggle
+        components_label = QLabel("Protection Components:")
+        config_layout.addWidget(components_label)
+        
+        self.noclip_check = QCheckBox("Anti NoClip")
+        self.spectate_check = QCheckBox("Anti Spectate")
+        self.chat_check = QCheckBox("Anti Fake Chat")
+        self.props_check = QCheckBox("Anti Blacklisted Props")
+        self.resource_check = QCheckBox("Resource Protection")
+        self.injection_check = QCheckBox("Anti Injection")
+        self.vpn_check = QCheckBox("Anti VPN")
+        self.explosion_check = QCheckBox("Explosion Protection")
+        self.weapon_check = QCheckBox("Weapon Protection")
+        
+        config_layout.addWidget(self.noclip_check)
+        config_layout.addWidget(self.spectate_check)
+        config_layout.addWidget(self.chat_check)
+        config_layout.addWidget(self.props_check)
+        config_layout.addWidget(self.resource_check)
+        config_layout.addWidget(self.injection_check)
+        config_layout.addWidget(self.vpn_check)
+        config_layout.addWidget(self.explosion_check)
+        config_layout.addWidget(self.weapon_check)
+        
+        config_group.setLayout(config_layout)
+        left_layout.addWidget(config_group)
+        
+        # Discord Integration
+        discord_group = QGroupBox("Discord Integration")
+        discord_layout = QGridLayout()
+        
+        discord_layout.addWidget(QLabel("Webhook URL:"), 0, 0)
+        self.webhook_input = QLineEdit()
+        discord_layout.addWidget(self.webhook_input, 0, 1)
+        
+        self.log_detections = QCheckBox("Log Detections")
+        self.log_kicks = QCheckBox("Log Kicks")
+        self.log_bans = QCheckBox("Log Bans")
+        
+        discord_layout.addWidget(self.log_detections, 1, 0)
+        discord_layout.addWidget(self.log_kicks, 1, 1)
+        discord_layout.addWidget(self.log_bans, 2, 0)
+        
+        discord_group.setLayout(discord_layout)
+        left_layout.addWidget(discord_group)
+        
+        splitter.addWidget(left_widget)
+        
+        # Right side - Advanced configuration tabs
+        right_widget = QTabWidget()
+        
+        # Blacklist Management Tab
+        blacklist_tab = QWidget()
+        blacklist_layout = QVBoxLayout(blacklist_tab)
+        
+        # Props Blacklist
+        props_group = QGroupBox("Blacklisted Props")
+        props_layout = QVBoxLayout()
+        
+        self.props_list = QListWidget()
+        props_layout.addWidget(self.props_list)
+        
+        props_buttons = QHBoxLayout()
+        self.add_prop_btn = QPushButton("Add Prop")
+        self.remove_prop_btn = QPushButton("Remove Prop")
+        self.add_prop_btn.clicked.connect(lambda: self.add_blacklist_item("prop"))
+        self.remove_prop_btn.clicked.connect(lambda: self.remove_blacklist_item("prop"))
+        props_buttons.addWidget(self.add_prop_btn)
+        props_buttons.addWidget(self.remove_prop_btn)
+        props_layout.addLayout(props_buttons)
+        
+        props_group.setLayout(props_layout)
+        blacklist_layout.addWidget(props_group)
+        
+        # Weapons Blacklist
+        weapons_group = QGroupBox("Blacklisted Weapons")
+        weapons_layout = QVBoxLayout()
+        
+        self.weapons_list = QListWidget()
+        weapons_layout.addWidget(self.weapons_list)
+        
+        weapons_buttons = QHBoxLayout()
+        self.add_weapon_btn = QPushButton("Add Weapon")
+        self.remove_weapon_btn = QPushButton("Remove Weapon")
+        self.add_weapon_btn.clicked.connect(lambda: self.add_blacklist_item("weapon"))
+        self.remove_weapon_btn.clicked.connect(lambda: self.remove_blacklist_item("weapon"))
+        weapons_buttons.addWidget(self.add_weapon_btn)
+        weapons_buttons.addWidget(self.remove_weapon_btn)
+        weapons_layout.addLayout(weapons_buttons)
+        
+        weapons_group.setLayout(weapons_layout)
+        blacklist_layout.addWidget(weapons_group)
+        
+        right_widget.addTab(blacklist_tab, "Blacklists")
+        
+        # Detection Rules Tab
+        rules_tab = QWidget()
+        rules_layout = QVBoxLayout(rules_tab)
+        
+        # NoClip Detection
+        noclip_group = QGroupBox("NoClip Detection")
+        noclip_layout = QGridLayout()
+        
+        noclip_layout.addWidget(QLabel("Trigger Count:"), 0, 0)
+        self.noclip_count = QSpinBox()
+        self.noclip_count.setValue(3)
+        noclip_layout.addWidget(self.noclip_count, 0, 1)
+        
+        noclip_layout.addWidget(QLabel("Action:"), 1, 0)
+        self.noclip_action = QComboBox()
+        self.noclip_action.addItems(["Kick", "Ban", "Log Only"])
+        noclip_layout.addWidget(self.noclip_action, 1, 1)
+        
+        noclip_group.setLayout(noclip_layout)
+        rules_layout.addWidget(noclip_group)
+        
+        # Weapon Detection
+        weapon_group = QGroupBox("Weapon Detection")
+        weapon_layout = QGridLayout()
+        
+        self.weapon_damage_check = QCheckBox("Detect Damage Modification")
+        self.weapon_explosive_check = QCheckBox("Detect Explosive Ammo")
+        self.weapon_infinite_check = QCheckBox("Detect Infinite Ammo")
+        
+        weapon_layout.addWidget(self.weapon_damage_check, 0, 0)
+        weapon_layout.addWidget(self.weapon_explosive_check, 1, 0)
+        weapon_layout.addWidget(self.weapon_infinite_check, 2, 0)
+        
+        weapon_group.setLayout(weapon_layout)
+        rules_layout.addWidget(weapon_group)
+        
+        right_widget.addTab(rules_tab, "Detection Rules")
+        
+        # Ban Management Tab
+        ban_tab = QWidget()
+        ban_layout = QVBoxLayout(ban_tab)
+        
+        self.ban_table = QTableWidget()
+        self.ban_table.setColumnCount(5)
+        self.ban_table.setHorizontalHeaderLabels([
+            "Player", "Steam ID", "Reason", "Date", "Actions"
+        ])
+        ban_layout.addWidget(self.ban_table)
+        
+        ban_buttons = QHBoxLayout()
+        self.add_ban_btn = QPushButton("Add Ban")
+        self.remove_ban_btn = QPushButton("Remove Ban")
+        self.export_bans_btn = QPushButton("Export Bans")
+        
+        self.add_ban_btn.clicked.connect(self.add_ban)
+        self.remove_ban_btn.clicked.connect(self.remove_ban)
+        self.export_bans_btn.clicked.connect(self.export_bans)
+        
+        ban_buttons.addWidget(self.add_ban_btn)
+        ban_buttons.addWidget(self.remove_ban_btn)
+        ban_buttons.addWidget(self.export_bans_btn)
+        
+        ban_layout.addLayout(ban_buttons)
+        right_widget.addTab(ban_tab, "Ban Management")
+        
+        splitter.addWidget(right_widget)
+        layout.addWidget(splitter)
+        
+        # Bottom buttons
+        buttons_layout = QHBoxLayout()
+        
+        self.save_btn = QPushButton("Save Configuration")
+        self.apply_btn = QPushButton("Apply Configuration")
+        self.export_btn = QPushButton("Export Configuration")
+        
+        self.save_btn.clicked.connect(self.save_config)
+        self.apply_btn.clicked.connect(self.apply_config)
+        self.export_btn.clicked.connect(self.export_config)
+        
+        buttons_layout.addWidget(self.save_btn)
+        buttons_layout.addWidget(self.apply_btn)
+        buttons_layout.addWidget(self.export_btn)
+        
+        layout.addLayout(buttons_layout)
+        
+        # Initialize with default anticheat
+        self.load_anticheat_config("Badger Anticheat")
+        
+    def load_anticheat_config(self, anticheat_name):
+        """Load configuration for selected anticheat"""
+        try:
+            self.current_anticheat = anticheat_name
+            
+            if anticheat_name == "Badger Anticheat":
+                # Load Badger anticheat config
+                self.noclip_check.setChecked(True)
+                self.spectate_check.setChecked(True)
+                self.chat_check.setChecked(True)
+                self.props_check.setChecked(True)
+                self.resource_check.setChecked(False)
+                self.injection_check.setChecked(False)
+                self.vpn_check.setChecked(False)
+                self.explosion_check.setChecked(True)
+                self.weapon_check.setChecked(True)
+                
+                # Load blacklists
+                self.load_badger_blacklists()
+                
+            elif anticheat_name == "WaveShield":
+                # Load WaveShield config
+                self.noclip_check.setChecked(False)
+                self.spectate_check.setChecked(True)
+                self.chat_check.setChecked(True)
+                self.props_check.setChecked(True)
+                self.resource_check.setChecked(True)
+                self.injection_check.setChecked(True)
+                self.vpn_check.setChecked(True)
+                self.explosion_check.setChecked(True)
+                self.weapon_check.setChecked(True)
+                
+                # Load blacklists
+                self.load_waveshield_blacklists()
+                
+            elif anticheat_name == "Dub Anticheat":
+                # Load Dub anticheat config
+                self.noclip_check.setChecked(False)
+                self.spectate_check.setChecked(True)
+                self.chat_check.setChecked(True)
+                self.props_check.setChecked(True)
+                self.resource_check.setChecked(True)
+                self.injection_check.setChecked(True)
+                self.vpn_check.setChecked(False)
+                self.explosion_check.setChecked(True)
+                self.weapon_check.setChecked(True)
+                
+                # Load blacklists
+                self.load_dub_blacklists()
+            
+            self.load_ban_list()
+            QMessageBox.information(self, "Success", f"Loaded {anticheat_name} configuration")
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load anticheat config: {str(e)}")
+            
+    def load_badger_blacklists(self):
+        """Load Badger anticheat blacklists"""
+        # Clear existing lists
+        self.props_list.clear()
+        self.weapons_list.clear()
+        
+        # Add default blacklisted props
+        props = [
+            "prop_fnclink_05crnr1",
+            "xs_prop_hamburgher_wl",
+            "xs_prop_plastic_bottle_wl",
+            "prop_windmill_01",
+            "p_spinning_anus_s"
+        ]
+        self.props_list.addItems(props)
+        
+        # Add default blacklisted weapons
+        weapons = [
+            "WEAPON_RAILGUN",
+            "WEAPON_GRENADELAUNCHER",
+            "WEAPON_RPG",
+            "WEAPON_MINIGUN"
+        ]
+        self.weapons_list.addItems(weapons)
+        
+    def load_waveshield_blacklists(self):
+        """Load WaveShield blacklists"""
+        # Clear existing lists
+        self.props_list.clear()
+        self.weapons_list.clear()
+        
+        # Add default blacklisted weapons
+        weapons = [
+            'WEAPON_GRENADELAUNCHER',
+            'WEAPON_RPG',
+            'WEAPON_STINGER',
+            'WEAPON_MINIGUN',
+            'WEAPON_RAILGUN',
+            'WEAPON_RAYPISTOL'
+        ]
+        self.weapons_list.addItems(weapons)
+        
+    def load_dub_blacklists(self):
+        """Load Dub anticheat blacklists"""
+        # Clear existing lists
+        self.props_list.clear()
+        self.weapons_list.clear()
+        
+        # Add default blacklisted props
+        props = [
+            "prop_fnclink_05crnr1",
+            "xs_prop_hamburgher_wl",
+            "prop_windmill_01",
+            "p_spinning_anus_s"
+        ]
+        self.props_list.addItems(props)
+        
+        # Add default blacklisted weapons
+        weapons = [
+            "WEAPON_SAWNOFFSHOTGUN",
+            "WEAPON_BULLPUPSHOTGUN",
+            "WEAPON_GRENADELAUNCHER",
+            "WEAPON_RPG"
+        ]
+        self.weapons_list.addItems(weapons)
+        
+    def add_blacklist_item(self, item_type):
+        """Add item to blacklist"""
+        try:
+            name, ok = QInputDialog.getText(
+                self, f"Add {item_type.title()}", 
+                f"Enter {item_type} name/hash:"
+            )
+            
+            if ok and name:
+                if item_type == "prop":
+                    self.props_list.addItem(name)
+                elif item_type == "weapon":
+                    self.weapons_list.addItem(name)
+                    
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to add {item_type}: {str(e)}")
+            
+    def remove_blacklist_item(self, item_type):
+        """Remove item from blacklist"""
+        try:
+            if item_type == "prop":
+                current = self.props_list.currentItem()
+                if current:
+                    self.props_list.takeItem(self.props_list.row(current))
+            elif item_type == "weapon":
+                current = self.weapons_list.currentItem()
+                if current:
+                    self.weapons_list.takeItem(self.weapons_list.row(current))
+                    
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to remove {item_type}: {str(e)}")
+            
+    def export_config(self):
+        """Export current configuration to file"""
+        try:
+            filename, _ = QFileDialog.getSaveFileName(
+                self, "Export Configuration",
+                f"{self.current_anticheat.replace(' ', '_').lower()}_config.json",
+                "JSON Files (*.json)"
+            )
+            
+            if filename:
+                config = {
+                    "anticheat": self.current_anticheat,
+                    "components": {
+                        "anti_noclip": self.noclip_check.isChecked(),
+                        "anti_spectate": self.spectate_check.isChecked(),
+                        "anti_fake_chat": self.chat_check.isChecked(),
+                        "anti_props": self.props_check.isChecked(),
+                        "resource_protection": self.resource_check.isChecked(),
+                        "anti_injection": self.injection_check.isChecked(),
+                        "anti_vpn": self.vpn_check.isChecked(),
+                        "explosion_protection": self.explosion_check.isChecked(),
+                        "weapon_protection": self.weapon_check.isChecked()
+                    },
+                    "detection_rules": {
+                        "noclip": {
+                            "trigger_count": self.noclip_count.value(),
+                            "action": self.noclip_action.currentText()
+                        },
+                        "weapons": {
+                            "detect_damage_mod": self.weapon_damage_check.isChecked(),
+                            "detect_explosive": self.weapon_explosive_check.isChecked(),
+                            "detect_infinite": self.weapon_infinite_check.isChecked()
+                        }
+                    },
+                    "blacklists": {
+                        "props": [self.props_list.item(i).text() for i in range(self.props_list.count())],
+                        "weapons": [self.weapons_list.item(i).text() for i in range(self.weapons_list.count())]
+                    },
+                    "discord": {
+                        "webhook_url": self.webhook_input.text(),
+                        "log_detections": self.log_detections.isChecked(),
+                        "log_kicks": self.log_kicks.isChecked(),
+                        "log_bans": self.log_bans.isChecked()
+                    }
+                }
+                
+                with open(filename, 'w') as f:
+                    json.dump(config, f, indent=4)
+                    
+                QMessageBox.information(
+                    self, "Success",
+                    f"Configuration exported to {filename}"
+                )
+                
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to export configuration: {str(e)}")
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -1735,6 +2167,10 @@ class MainWindow(QMainWindow):
         # Add Portfolio Management tab
         portfolio_tab = PortfolioTab()
         tabs.addTab(portfolio_tab, "Portfolio")
+        
+        # Add FiveM Anticheat tab
+        fivem_anticheat_tab = FiveMAntiCheatTab()
+        tabs.addTab(fivem_anticheat_tab, "FiveM Anticheat")
         
         layout.addWidget(tabs)
         
